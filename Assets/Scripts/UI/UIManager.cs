@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI title;
 
     [SerializeField] private int index = 0;
+
+    private int currentScreenIndex;
 
     private void Start()
     {
@@ -28,6 +31,7 @@ public class UIManager : MonoBehaviour
         title.text = screens[index].name;
 
         screens[index].SetActive(true);
+        currentScreenIndex = index;
     }
     public void Previous()
     {
@@ -40,5 +44,27 @@ public class UIManager : MonoBehaviour
         title.text = screens[index].name;
 
         screens[index].SetActive(true);
+        currentScreenIndex = index;
     }
+
+
+
+    public void ShowScreen(string name)
+    {
+        int temp = 0;
+
+        foreach(GameObject screen in screens)
+        {
+            //Debug.Log(screen.name);
+            if(screen.name == name)
+            {
+                screen.SetActive(true);
+                screens[currentScreenIndex].SetActive(false);
+                currentScreenIndex = temp;
+                break;
+            }
+            temp++;
+        }
+    }
+    
 }
