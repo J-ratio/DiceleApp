@@ -7,6 +7,9 @@ public class ToggleInteract : MonoBehaviour
 {
     private Toggle toggle;
     private Animator anime;
+    [SerializeField] private Color dayThemeColor;
+    [SerializeField] private Color nightThemeColor;
+    [SerializeField] private ParticleSystem particleSystem;
     private void Start()
     {
         toggle = GetComponent<Toggle>();
@@ -30,5 +33,20 @@ public class ToggleInteract : MonoBehaviour
                 anime.Play("Off", 0, normalTime);
             }
         }
+    }
+
+    private void DayModeParticle()
+    {
+        if (particleSystem == null) return;
+
+        particleSystem.startColor = dayThemeColor;
+        particleSystem.Play();
+    }
+    private void NightModeParticle()
+    {
+        if (particleSystem == null) return;
+
+        particleSystem.startColor = nightThemeColor;
+        particleSystem.Play();
     }
 }
