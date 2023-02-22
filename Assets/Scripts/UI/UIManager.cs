@@ -103,13 +103,25 @@ public class UIManager : MonoBehaviour
 
     //ResultScreenUpdateFuntions
 
-    public void UpdateResultScreen(int score, int rank, int Xp, int Coins)
+    public void UpdateResultScreen(int score, int rank, int Xp, int Coins, bool showRank)
     {
         ResultScreenUI[0].text = score.ToString();
         ResultScreenUI[1].text = score.ToString();
         ResultScreenUI[2].text = rank.ToString();
         ResultScreenUI[3].text = Xp.ToString();
         ResultScreenUI[4].text = Coins.ToString();
+
+
+        if(showRank){
+            ResultScreenScoreUI[0].SetActive(false);
+            ResultScreenScoreUI[1].SetActive(true);
+            ResultScreenScoreUI[2].SetActive(true);
+        }
+        else{
+            ResultScreenScoreUI[0].SetActive(true);
+            ResultScreenScoreUI[1].SetActive(false);
+            ResultScreenScoreUI[2].SetActive(false);
+        }
     }
 
 

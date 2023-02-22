@@ -10,7 +10,7 @@ public class DataManager : MonoBehaviour
     private List<int> solList = new List<int>();
     private List<int> spawnList = new List<int>();
     private int gameIndex;
-    private int ClassicLvlIndex;
+    public int ClassicLvlIndex;
     private bool isDaily = true;
 
     DateTime StartDate = new DateTime(2023,1,10);
@@ -43,9 +43,10 @@ public class DataManager : MonoBehaviour
     private int[] tempExampleDailySolArr = {5, 5, 2, 3, 1, 3, -1, 0, -1, 4, 4, 4, 3, 5, 0, 3, -1, 0, -1, 0, 1, 2, 1, 1, 2};
     private int[] tempExampleDailySpawnArr = {0, 2, 4, 1, 5, 2, -1, 5, -1, 0, 3, 3, 5, 0, 2, 0, -1, 1, -1, 1, 3, 1, 3, 4, 4};
 
-
-    private int[] tempExampleClassicSolArr1 = {0,1,2,3,-1,4,5,4,3};
-    private int[] tempExampleClassicSpawnArr1 = {0,3,4,3,-1,2,5,4,1};
+    private int[] tempExampleClassicSolArr0 = {3,1,0,5};
+    private int[] tempExampleClassicSpawnArr0 = {5,1,0,3};
+    private int[] tempExampleClassicSolArr1 = {0,1,4,1,-1,0,5,0,2};
+    private int[] tempExampleClassicSpawnArr1 = {2,1,0,1,-1,0,5,0,4};
     private int[] tempExampleClassicSolArr2 = {0,1,2,3,4,-1,5,4,3,2,-1,1,0,1,2,3};
     private int[] tempExampleClassicSpawnArr2 = {3,0,2,4,4,-1,2,3,3,2,-1,1,1,1,5,0};
 
@@ -85,7 +86,7 @@ public class DataManager : MonoBehaviour
 
 
         //_____________________________________________________________________________________________
-        //retrieves the playerXp and playerCoins and currentClassicLvl from the database and stores them into the given variables.
+        //retrieves the playerXp and playerCoins and ClassicLvlIndex from the database and stores them into the given variables.
         //_____________________________________________________________________________________________
         ClassicLvlIndex = 0;
         PlayerXp = 0;
@@ -158,9 +159,9 @@ public class DataManager : MonoBehaviour
         //________________________________________________________________________________________________
         //fetches nth(ClassicLvlIndex) array of Solution and Spawn GameData fields from database and stores in solList and spawnList
         //________________________________________________________________________________________________
-        if(ClassicLvlIndex == 0)    StoreGameData(tempExampleClassicSpawnArr1,tempExampleClassicSolArr1);
-        else   StoreGameData(tempExampleClassicSpawnArr2,tempExampleClassicSolArr2);
-
+        if(ClassicLvlIndex == 0)    StoreGameData(tempExampleClassicSpawnArr0,tempExampleClassicSolArr0);
+        else if(ClassicLvlIndex == 1)   StoreGameData(tempExampleClassicSpawnArr1,tempExampleClassicSolArr1);
+        else    StoreGameData(tempExampleClassicSpawnArr2,tempExampleClassicSolArr2);
 
         currStateList = new List<int>(spawnList);
 
@@ -222,67 +223,84 @@ public class DataManager : MonoBehaviour
 
         // TimeBonus + MoveBonus + WinningBonus(1000)
         int score = ((playtime < 50) ? 500 : (playtime > 290 ? 20 : (300 - playtime)*2)) + (21 - swapped)*100 + 1000; 
-        // Winning Bonus(10) + ScoreImprovementBonus
-        int xp = 10 + ((score - ScoreList[gameIndex]) > 0 ? (score - ScoreList[gameIndex]) : 0) /100;
-
+        int xp = 0;
         int coins;
+        int rank = 0;
+
         if(isDaily)
         {
             coins = (xp - 10 > 30 ? (xp - 10)/100 : 30);
+            // Winning Bonus(10) + ScoreImprovementBonus
+            xp = 10 + ((score - ScoreList[gameIndex]) > 0 ? (score - ScoreList[gameIndex]) : 0) /100;
         }
         else
         {
             coins = 10;
-        }
-
-        if(ScoreList[gameIndex] < score)
-        {
-            //_____________________________________________________________________________________________
-            //stores the score value in DataBase's scorelist at position gameIndex
-            //_____________________________________________________________________________________________
-        }
-
-        if(MovesList[gameIndex] > swapped)
-        {
-            //_____________________________________________________________________________________________
-            //stores the swapped values in DataBase's moveslist at position gameIndex
-            //_____________________________________________________________________________________________
+            xp = 10 + (score)/100;
         }
 
 
-        int rank = 0;
-        //get rank if gameType == Daily
-        if( gameIndex  == DayNum)
+        //Updating Database
+        if(isDaily)
         {
-            if(score > ScoreList[gameIndex])
+            
+            if(ScoreList[gameIndex] < score)
             {
                 //_____________________________________________________________________________________________
-                //updates rank from the above score value
+                //stores the score value in DataBase's scorelist at position gameIndex
                 //_____________________________________________________________________________________________
             }
 
-        //_____________________________________________________________________________________________
-        //fetches rank from the above score value
-        //_____________________________________________________________________________________________
+            if(MovesList[gameIndex] > swapped)
+            {
+                //_____________________________________________________________________________________________
+                //stores the swapped values in DataBase's moveslist at position gameIndex
+                //_____________________________________________________________________________________________
+            }
 
-        rank = 1000;
+
+            //get rank if gameType == Daily
+            if( gameIndex  == DayNum)
+            {
+                if(score > ScoreList[gameIndex])
+                {
+                    //_____________________________________________________________________________________________
+                    //updates rank for the above score value
+                    //_____________________________________________________________________________________________
+                }
+
+                //_____________________________________________________________________________________________
+                //fetches rank for the above score value
+                //_____________________________________________________________________________________________
+
+                rank = 1000;
+            }
+        }
+        else
+        {
+            ClassicLvlIndex ++;
+            //_____________________________________________________________________________________________
+            //updates the currentClassicLvl variable for the given playerID
+            //_____________________________________________________________________________________________
         }
 
-        UIManager.UpdateResultScreen(score,rank,xp,coins);
 
+        //Show Results
         if(gameIndex == DayNum && isDaily){
-            UIManager.ResultScreenScoreUI[0].SetActive(false);
-            UIManager.ResultScreenScoreUI[1].SetActive(true);
-            UIManager.ResultScreenScoreUI[2].SetActive(true);
+            UIManager.UpdateResultScreen(score,rank,xp,coins,true);
         }
         else{
-            UIManager.ResultScreenScoreUI[0].SetActive(true);
-            UIManager.ResultScreenScoreUI[1].SetActive(false);
-            UIManager.ResultScreenScoreUI[2].SetActive(false);
+            UIManager.UpdateResultScreen(score,rank,xp,coins,false);
         }
 
-        UIManager.OpenScreen("Level_Complete_Canvas");
-        UIManager.CloseScreen("GamePlay_Canvas");
+        if(isDaily || (ClassicLvlIndex!=1 && ClassicLvlIndex!=2)){
+            UIManager.OpenScreen("Level_Complete_Canvas");
+            UIManager.CloseScreen("GamePlay_Canvas");
+        }
+        else{
+            //trigger event for tutorial levels
+        }
+
     }
 
 
@@ -290,6 +308,23 @@ public class DataManager : MonoBehaviour
     {
         UIManager.OpenScreen("Level_Failed_Canvas");
         UIManager.CloseScreen("GamePlay_Canvas");
+    }
+
+    public void RetryLvl(bool RetryAfterWin)
+    {
+        if(RetryAfterWin)
+        {
+            StartLvl(gameIndex);   
+        }
+        else{
+            if(isDaily)
+            {
+
+            }
+            else{
+                
+            }
+        }
     }
 
 
