@@ -116,6 +116,15 @@ MonoBehaviour:
   slotPos: {x: 0, y: 0}
   slotsolution: 0
   diceNumber: 0
+  matched: 0
+  isTutorial: 0
+  colorType: 0
+  maxScale: 65
+  maxAlpha: 0.8
+  highlightSpeed: 50
+  alphaSpeed: 3
+  spriteRenderer: {fileID: 1982607068907569086}
+  boxCollider: {fileID: 8630988206348542484}
 --- !u!61 &8630988206348542484
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -133,7 +142,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.56, y: 2.56}
+    oldSize: {x: 2.49, y: 2.52}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

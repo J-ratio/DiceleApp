@@ -13,8 +13,8 @@ public class DataManager : MonoBehaviour
     public int ClassicLvlIndex;
     private bool isDaily = true;
 
-    DateTime StartDate = new DateTime(2023,1,10);
-    
+    DateTime StartDate = new DateTime(2023, 1, 10);
+
     // # of days since start date
     private int DayNum;
 
@@ -40,17 +40,17 @@ public class DataManager : MonoBehaviour
     private UIManager UIManager;
 
 
-    private int[] tempExampleDailySolArr = {5, 5, 2, 3, 1, 3, -1, 0, -1, 4, 4, 4, 3, 5, 0, 3, -1, 0, -1, 0, 1, 2, 1, 1, 2};
-    private int[] tempExampleDailySpawnArr = {0, 2, 4, 1, 5, 2, -1, 5, -1, 0, 3, 3, 5, 0, 2, 0, -1, 1, -1, 1, 3, 1, 3, 4, 4};
+    private int[] tempExampleDailySolArr = { 5, 5, 2, 3, 1, 3, -1, 0, -1, 4, 4, 4, 3, 5, 0, 3, -1, 0, -1, 0, 1, 2, 1, 1, 2 };
+    private int[] tempExampleDailySpawnArr = { 0, 2, 4, 1, 5, 2, -1, 5, -1, 0, 3, 3, 5, 0, 2, 0, -1, 1, -1, 1, 3, 1, 3, 4, 4 };
 
-    private int[] tempExampleClassicSolArr0 = {3,1,0,5};
-    private int[] tempExampleClassicSpawnArr0 = {5,1,0,3};
-    private int[] tempExampleClassicSolArr1 = {0,1,4,1,-1,0,5,0,2};
-    private int[] tempExampleClassicSpawnArr1 = {2,1,0,1,-1,0,5,0,4};
-    private int[] tempExampleClassicSolArr2 = {0,1,2,3,4,-1,5,4,3,2,-1,1,0,1,2,3};
-    private int[] tempExampleClassicSpawnArr2 = {3,0,2,4,4,-1,2,3,3,2,-1,1,1,1,5,0};
+    private int[] tempExampleClassicSolArr0 = { 3, 1, 0, 5 };
+    private int[] tempExampleClassicSpawnArr0 = { 5, 1, 0, 3 };
+    private int[] tempExampleClassicSolArr1 = { 0, 1, 4, 1, -1, 0, 5, 0, 2 };
+    private int[] tempExampleClassicSpawnArr1 = { 2, 1, 0, 1, -1, 0, 5, 0, 4 };
+    private int[] tempExampleClassicSolArr2 = { 0, 1, 2, 3, 4, -1, 5, 4, 3, 2, -1, 1, 0, 1, 2, 3 };
+    private int[] tempExampleClassicSpawnArr2 = { 3, 0, 2, 4, 4, -1, 2, 3, 3, 2, -1, 1, 1, 1, 5, 0 };
 
-
+    [SerializeField] private GamePlayTutorial playTutorial;//Added by charan
 
     void OnEnable()
     {
@@ -67,7 +67,7 @@ public class DataManager : MonoBehaviour
     {
 
         DayNum = (DateTime.Now - StartDate).Days;
-        MonthNum = (DateTime.Now.Month - StartDate.Month) + 12*(DateTime.Now.Year - StartDate.Year);
+        MonthNum = (DateTime.Now.Month - StartDate.Month) + 12 * (DateTime.Now.Year - StartDate.Year);
 
 
         ScoreList = new List<int>(DayNum + 1);
@@ -91,14 +91,14 @@ public class DataManager : MonoBehaviour
         ClassicLvlIndex = 0;
         PlayerXp = 0;
         PlayerCoins = 0;
-        UIManager.UpdateMainScreenStats(PlayerXp,PlayerCoins);
+        UIManager.UpdateMainScreenStats(PlayerXp, PlayerCoins);
         UIManager.UpdateClassicLevel(ClassicLvlIndex + 1);
 
 
         //get daily and weekly rank from leaderboard
 
         //get stats 
-    
+
 
     }
 
@@ -110,12 +110,13 @@ public class DataManager : MonoBehaviour
 
     public void StartCalander()
     {
-        if(isDaily)
+        if (isDaily)
         {
             UIManager.OpenScreen("Calander_Canvas");
             ActionEvents.StartCalander(MovesList);
         }
-        else{
+        else
+        {
             isDaily = true;
             UIManager.OpenScreen("Main_Menu_Canvas");
         }
@@ -129,16 +130,17 @@ public class DataManager : MonoBehaviour
 
     private void StartLvl(int levelNum)
     {
+        playTutorial.isClassic = false;//Added by charan
         isDaily = true;
         gameIndex = levelNum;
         //________________________________________________________________________________________________
         //fetches nth(gameIndex) array of Solution and Spawn GameData fields from database and stores in solList and spawnList
         //________________________________________________________________________________________________
-        StoreGameData(tempExampleDailySpawnArr,tempExampleDailySolArr);
+        StoreGameData(tempExampleDailySpawnArr, tempExampleDailySolArr);
 
         currStateList = new List<int>(spawnList);
 
-        UIManager.UpdateGameScreen(PlayerCoins, StartDate.AddDays(gameIndex).Day, StartDate.AddDays(gameIndex).ToString("MMMM").Substring(0,3) , 100 , 50);
+        UIManager.UpdateGameScreen(PlayerCoins, StartDate.AddDays(gameIndex).Day, StartDate.AddDays(gameIndex).ToString("MMMM").Substring(0, 3), 100, 50);
 
 
         //Opens the game canvas
@@ -147,7 +149,7 @@ public class DataManager : MonoBehaviour
 
 
         //Sends the Lists to gameBoard
-        ActionEvents.SendGameData(solList,spawnList,0);
+        ActionEvents.SendGameData(solList, spawnList, 0);
 
 
     }
@@ -155,13 +157,14 @@ public class DataManager : MonoBehaviour
 
     public void StartClassicLvl()
     {
-        isDaily = false;   
+        playTutorial.isClassic = true;//Added by charan
+        isDaily = false;
         //________________________________________________________________________________________________
         //fetches nth(ClassicLvlIndex) array of Solution and Spawn GameData fields from database and stores in solList and spawnList
         //________________________________________________________________________________________________
-        if(ClassicLvlIndex == 0)    StoreGameData(tempExampleClassicSpawnArr0,tempExampleClassicSolArr0);
-        else if(ClassicLvlIndex == 1)   StoreGameData(tempExampleClassicSpawnArr1,tempExampleClassicSolArr1);
-        else    StoreGameData(tempExampleClassicSpawnArr2,tempExampleClassicSolArr2);
+        if (ClassicLvlIndex == 0) StoreGameData(tempExampleClassicSpawnArr0, tempExampleClassicSolArr0);
+        else if (ClassicLvlIndex == 1) StoreGameData(tempExampleClassicSpawnArr1, tempExampleClassicSolArr1);
+        else StoreGameData(tempExampleClassicSpawnArr2, tempExampleClassicSolArr2);
 
         currStateList = new List<int>(spawnList);
 
@@ -170,8 +173,7 @@ public class DataManager : MonoBehaviour
 
 
         //Sends the Lists to gameBoard
-        ActionEvents.SendGameData(solList,spawnList,0);
-
+        ActionEvents.SendGameData(solList, spawnList, 0);
 
     }
 
@@ -180,7 +182,7 @@ public class DataManager : MonoBehaviour
         solList.Clear();
         spawnList.Clear();
 
-        for(int i = 0; i < spawn.Count(); i ++)
+        for (int i = 0; i < spawn.Count(); i++)
         {
             solList.Add(sol[i]);
             spawnList.Add(spawn[i]);
@@ -195,14 +197,13 @@ public class DataManager : MonoBehaviour
 
     private void StartCustomLevel()
     {
-
         //________________________________________________________________________________________________
         //fetches nth(gameIndex) array of Solution GameData fields from database and stores in solList
         //________________________________________________________________________________________________
-        StoreGameData(tempExampleDailySolArr,currStateList.ToArray());
+        StoreGameData(tempExampleDailySolArr, currStateList.ToArray());
 
         //Sends the Lists to gameBoard 
-        ActionEvents.SendGameData(solList,spawnList,1);
+        ActionEvents.SendGameData(solList, spawnList, 1);
 
         //Opens the game canvas
         UIManager.OpenScreen("GamePlay_Canvas");
@@ -220,38 +221,37 @@ public class DataManager : MonoBehaviour
 
     private void GameWinEvent(int swapped, int playtime)
     {
-
         // TimeBonus + MoveBonus + WinningBonus(1000)
-        int score = ((playtime < 50) ? 500 : (playtime > 290 ? 20 : (300 - playtime)*2)) + (21 - swapped)*100 + 1000; 
+        int score = ((playtime < 50) ? 500 : (playtime > 290 ? 20 : (300 - playtime) * 2)) + (21 - swapped) * 100 + 1000;
         int xp = 0;
         int coins;
         int rank = 0;
 
-        if(isDaily)
+        if (isDaily)
         {
-            coins = (xp - 10 > 30 ? (xp - 10)/100 : 30);
+            coins = (xp - 10 > 30 ? (xp - 10) / 100 : 30);
             // Winning Bonus(10) + ScoreImprovementBonus
-            xp = 10 + ((score - ScoreList[gameIndex]) > 0 ? (score - ScoreList[gameIndex]) : 0) /100;
+            xp = 10 + ((score - ScoreList[gameIndex]) > 0 ? (score - ScoreList[gameIndex]) : 0) / 100;
         }
         else
         {
             coins = 10;
-            xp = 10 + (score)/100;
+            xp = 10 + (score) / 100;
         }
 
 
         //Updating Database
-        if(isDaily)
+        if (isDaily)
         {
-            
-            if(ScoreList[gameIndex] < score)
+
+            if (ScoreList[gameIndex] < score)
             {
                 //_____________________________________________________________________________________________
                 //stores the score value in DataBase's scorelist at position gameIndex
                 //_____________________________________________________________________________________________
             }
 
-            if(MovesList[gameIndex] > swapped)
+            if (MovesList[gameIndex] > swapped)
             {
                 //_____________________________________________________________________________________________
                 //stores the swapped values in DataBase's moveslist at position gameIndex
@@ -260,9 +260,9 @@ public class DataManager : MonoBehaviour
 
 
             //get rank if gameType == Daily
-            if( gameIndex  == DayNum)
+            if (gameIndex == DayNum)
             {
-                if(score > ScoreList[gameIndex])
+                if (score > ScoreList[gameIndex])
                 {
                     //_____________________________________________________________________________________________
                     //updates rank for the above score value
@@ -278,7 +278,7 @@ public class DataManager : MonoBehaviour
         }
         else
         {
-            ClassicLvlIndex ++;
+            ClassicLvlIndex++;
             //_____________________________________________________________________________________________
             //updates the currentClassicLvl variable for the given playerID
             //_____________________________________________________________________________________________
@@ -286,23 +286,29 @@ public class DataManager : MonoBehaviour
 
 
         //Show Results
-        if(gameIndex == DayNum && isDaily){
-            UIManager.UpdateResultScreen(score,rank,xp,coins,true);
+        if (gameIndex == DayNum && isDaily)
+        {
+            UIManager.UpdateResultScreen(score, rank, xp, coins, true);
         }
-        else{
-            UIManager.UpdateResultScreen(score,rank,xp,coins,false);
+        else
+        {
+            UIManager.UpdateResultScreen(score, rank, xp, coins, false);
         }
 
-        if(isDaily || (ClassicLvlIndex!=1 && ClassicLvlIndex!=2)){
+        if (isDaily || (ClassicLvlIndex != 1 && ClassicLvlIndex != 2))
+        {
             UIManager.OpenScreen("Level_Complete_Canvas");
             UIManager.CloseScreen("GamePlay_Canvas");
         }
-        else{
+        else
+        {
+            //Added by charan
+            UIManager.OpenScreen("Level_TutComplete_Canvas");
+            UIManager.CloseScreen("GamePlay_Canvas");
             //trigger event for tutorial levels
+            //....
         }
-
     }
-
 
     private void GameLoseEvent()
     {
@@ -312,17 +318,19 @@ public class DataManager : MonoBehaviour
 
     public void RetryLvl(bool RetryAfterWin)
     {
-        if(RetryAfterWin)
+        if (RetryAfterWin)
         {
-            StartLvl(gameIndex);   
+            StartLvl(gameIndex);
         }
-        else{
-            if(isDaily)
+        else
+        {
+            if (isDaily)
             {
 
             }
-            else{
-                
+            else
+            {
+
             }
         }
     }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +17,10 @@ public class ToggleInteract : MonoBehaviour
         {
             Toggle_Button(0);
         });
+
+        if (particleSystem == null) return;
+
+        particleSystem.Stop();
     }
     public void Toggle_Button(int normalTime)
     {

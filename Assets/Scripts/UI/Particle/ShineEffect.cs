@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,14 +13,16 @@ public class ShineEffect : MonoBehaviour
     [SerializeField] private float delay;
     private RectTransform rectTransform;
     float eTime;
-
+    float distance;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
+        distance = Vector2.Distance(startPoint,endPoint);
     }
 
     private void OnEnable()
     {
+        rectTransform.anchoredPosition = startPoint;
         startAnimation?.Invoke();
     }
     
@@ -40,12 +41,12 @@ public class ShineEffect : MonoBehaviour
     {
         yield return new WaitForSeconds(startdelay);
 
-        eTime = 0;
+        //eTime = 0;
         while (rectTransform.anchoredPosition != endPoint)
         {
-            rectTransform.anchoredPosition = Vector3.MoveTowards(rectTransform.anchoredPosition, endPoint, eTime);
+            rectTransform.anchoredPosition = Vector3.MoveTowards(rectTransform.anchoredPosition, endPoint, Time.deltaTime * (distance/time));
 
-            eTime += Time.deltaTime/time;
+            //eTime += Time.deltaTime/time;
 
             if (rectTransform.anchoredPosition == endPoint)
             {
