@@ -115,7 +115,7 @@ public class Calander : MonoBehaviour
             }
             else if( MovesList[i] == -1)
             {
-                StateList.Add(1);
+                StateList.Add(4);
                 StarsList.Add(0);
             }
             else
@@ -277,11 +277,11 @@ public class Calander : MonoBehaviour
     {
         if(direction)
         {
-            currDate = currDate.AddMonths(-1);
+            currDate = currDate.AddMonths(1);
         }
         else
         {
-            currDate = currDate.AddMonths(1);
+            currDate = currDate.AddMonths(-1);
         }
 
         UpdateCalendar(currDate.Year, currDate.Month);

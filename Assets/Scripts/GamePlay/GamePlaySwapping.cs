@@ -36,6 +36,20 @@ public class GamePlaySwapping : MonoBehaviour
         }
     }
 
+
+    public void SwapDices2(Dice dice_1, Dice dice_2, Action callBack, int intialSortOrder, int finalSortOrder)
+    {
+        if (!isSwapping)
+        {
+            isSwapping = true;
+            Transform dice = dice_1.transform.parent;
+            dice_1.transform.SetParent(dice_2.transform.parent);
+            dice_2.transform.SetParent(dice);
+
+            StartCoroutine(Swap_2(dice_1, dice_2, callBack, intialSortOrder, finalSortOrder));
+        }
+    }
+
     IEnumerator Swap(Dice dice_1, Dice dice_2, Action callBack, int intialSortOrder, int finalSortOrder)
     {
         bool dice_1_particle = false;

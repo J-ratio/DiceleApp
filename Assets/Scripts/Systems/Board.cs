@@ -18,6 +18,13 @@ public class Board : MonoBehaviour
     private GameObject HorSumList;
     [SerializeField]
     private TextMeshProUGUI movesText;
+    [SerializeField]
+    GameObject UndoButton;
+    [SerializeField]
+    GameObject HintButton;
+
+    [SerializeField]
+    private HandAnimation hand;
 
 
 
@@ -26,6 +33,10 @@ public class Board : MonoBehaviour
     int matched;
     int swapped;
     int time;
+
+
+    int currentUndoNum;
+    int currentHintNum;
 
 
 
@@ -44,11 +55,13 @@ public class Board : MonoBehaviour
     public List<List<int>> lineSolutionList = new List<List<int>>();
     public List<int> emptySlots = new List<int>();
 
+
     int[] freqList = { -1, -1, -1, -1, -1, -1 };
     int[] freqListDuplicate = new int[6];
 
     [SerializeField]
     private List<Dice> diceList;
+    private List<Dice> previousSwappedDice = new List<Dice>();
 
     //Added by charan
     [SerializeField] private GamePlayAnimation playAnimation;
@@ -61,6 +74,8 @@ public class Board : MonoBehaviour
     {
         ActionEvents.swapDice += SwapDice;
         ActionEvents.SendGameData += ReceiveGameData;
+        ActionEvents.Undo += Undo;
+        ActionEvents.Hint += Hint;
     }
 
     void Start()
@@ -80,6 +95,15 @@ public class Board : MonoBehaviour
         CreateDice();
         StartCoroutine("Timer");
         movesText.text = (21 - swapped).ToString();
+        currentUndoNum = 0;
+        currentHintNum = 0;
+
+        UndoButton.GetComponent<Button>().enabled = false;
+        UndoButton.transform.GetChild(0).gameObject.SetActive(false);
+        UndoButton.transform.GetChild(1).gameObject.SetActive(true);
+
+        HintButton.GetComponent<Button>().enabled = true;
+
     }
 
     private void createDiceFreq()
@@ -203,12 +227,15 @@ public class Board : MonoBehaviour
     {
         for (int i = 0; i < 2 * Num; i++)
         {
-            for (int j = 0; j < Num; j++)
+            string result = "";
+            foreach (var item in lineSolutionList[i])
             {
-                Debug.Log(lineSolutionList[i][j]);
+                result += item.ToString() + ", ";
             }
-            Debug.Log("-----------------------------------------------");
+            Debug.Log(result);
         }
+        Debug.Log("-----------------------------------------------");
+
     }
 
 
@@ -355,6 +382,8 @@ public class Board : MonoBehaviour
                     lineSolutionList[dice.slotPos[0] + Num].Remove(dice.diceNumber);
                     matched++;
 
+                    LogLineSol();
+
                     dice.matched = true;
                 }
             }
@@ -366,12 +395,14 @@ public class Board : MonoBehaviour
         CheckColor();
         StartTutorial();
     }
+
     //Added by charan
     void StartTutorial()
     {
         isTutorial = gamePlayTutorial.Init(diceList);
     }
     //....
+
     public void ClearDice()
     {
         matched = 0;
@@ -409,6 +440,7 @@ public class Board : MonoBehaviour
             }
         }
     }
+
     //Added by charan
     internal bool CheckSwapDice(Dice swap_dice)
     {
@@ -418,10 +450,15 @@ public class Board : MonoBehaviour
         return dice.isTutorial;
     }
     //....
+
     private void SwapDice(Dice swap_dice)
     {
+        hand.gameObject.SetActive(false);
 
         Dice dice = FindClosestDice(swap_dice);
+        previousSwappedDice.Clear();
+        previousSwappedDice.Add(dice);
+        previousSwappedDice.Add(swap_dice);
         if (dice == swap_dice)
         {
             StartCoroutine(MoveTowardsTarget(swap_dice, dice.GetInitialPos(), 10));
@@ -451,8 +488,23 @@ public class Board : MonoBehaviour
                 dice.GetComponent<BoxCollider2D>().enabled = false;
                 lineSolutionList[dice.slotPos[1]].Remove(dice.diceNumber);
                 lineSolutionList[dice.slotPos[0] + Num].Remove(dice.diceNumber);
+                //LogLineSol();
                 dice.matched = true;
                 matched++;
+
+                List<int> tempList1 = new List<int>(lineSolutionList[dice.slotPos[1]]);
+                tempList1.RemoveAll( x => x == -1);
+                if(tempList1.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                {
+                    playAnimation.CheckAndPlayVerticalAnimation(dice.slotPos[1]);
+                }
+                List<int> tempList2 = new List<int>(lineSolutionList[dice.slotPos[0]+Num]);
+                tempList2.RemoveAll(x => x == -1);
+                if(tempList2.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                {
+                    playAnimation.CheckAndPlayHorizontalAnimation(dice.slotPos[0]);
+                    Debug.Log(dice.slotPos[0]);
+                }
             }
             if (swap_dice.slotsolution == swap_dice.diceNumber)
             {
@@ -461,26 +513,61 @@ public class Board : MonoBehaviour
                 swap_dice.GetComponent<BoxCollider2D>().enabled = false;
                 lineSolutionList[swap_dice.slotPos[1]].Remove(swap_dice.diceNumber);
                 lineSolutionList[swap_dice.slotPos[0] + Num].Remove(swap_dice.diceNumber);
+                //LogLineSol();
                 matched++;
-                dice.matched = true;
+                swap_dice.matched = true;
+
+                List<int> tempList1 = new List<int>(lineSolutionList[swap_dice.slotPos[1]]);
+                tempList1.RemoveAll(x => x == -1);
+                if(tempList1.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                {
+                    playAnimation.CheckAndPlayVerticalAnimation(swap_dice.slotPos[1]);
+                }
+                List<int> tempList2 = new List<int>(lineSolutionList[swap_dice.slotPos[0]+Num]);
+                tempList2.RemoveAll(x => x == -1);
+                if(tempList2.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                {
+                    playAnimation.CheckAndPlayHorizontalAnimation(swap_dice.slotPos[0]);
+                    Debug.Log(swap_dice.slotPos[0]);
+                }
             }
 
             swapped++;
+
+            if(currentUndoNum < 3) 
+            {
+                UndoButton.GetComponent<Button>().enabled = true;
+                UndoButton.transform.GetChild(0).gameObject.SetActive(true);
+                UndoButton.transform.GetChild(1).gameObject.SetActive(false);
+            }
+
+            if(currentHintNum < 4)
+            {
+                HintButton.GetComponent<Button>().enabled = true;
+                HintButton.transform.GetChild(0).gameObject.SetActive(true);
+                HintButton.transform.GetChild(1).gameObject.SetActive(false);
+            }
+
             movesText.text = (21 - swapped).ToString();
 
             ActionEvents.UpdateGameState(dice.slotPos[0] * Num + dice.slotPos[1], swap_dice.slotPos[0] * Num + swap_dice.slotPos[1]);
 
             CheckColor();
-            //Added and modified by charan
+
+            //Modified by charan
             if (isTutorial)
                 gamePlayParticle.SwapDices(dice, swap_dice, SwapDone, 10, 4);
             else
                 gamePlayParticle.SwapDices(dice, swap_dice, SwapDone, 5, 4);
 
+
             void SwapDone()
             {
                 if (matched == Num * Num - emptySlots.Count)
                 {
+                    UndoButton.GetComponent<Button>().enabled = false;
+                    HintButton.GetComponent<Button>().enabled = false;
+
                     playAnimation.CheckAndPlayFinalHorizontalAnimation(VerticleAlso);
                     isTutorial = false;
                 }
@@ -492,6 +579,9 @@ public class Board : MonoBehaviour
             //.....
         }
     }
+
+
+
     //Added by charan
     void VerticleAlso() => playAnimation.CheckAndPlayFinalVerticalAnimation(GameWin);
     public void StopTutorial() => isTutorial = false;
@@ -500,10 +590,12 @@ public class Board : MonoBehaviour
         isTutorial = false;
         gamePlayTutorial?.TutorialFinish();
     }
+    //...
+
+
     public void GameWin()
     {
         ClearDice();
-        Debug.Log("finished");
         ActionEvents.TriggerGameWinEvent(swapped, time);
     }
 
@@ -513,15 +605,15 @@ public class Board : MonoBehaviour
         ActionEvents.TriggerGameLoseEvent();
     }
 
-    //...
-    private void ReceiveGameData(List<int> sol, List<int> spawn, int actionIndex)
+
+    private void ReceiveGameData(List<int> sol, List<int> spawn, int actionIndex, bool isDaily)
     {
         Num = (int)Mathf.Sqrt(sol.Count);
 
-        if (actionIndex == 1)
-        {
-            swapped = 18;
-        }
+        swapped = 0;
+        matched = 0;
+
+        if (actionIndex == 1)   swapped = 18;
 
         solArray.Clear();
         spawnArray.Clear();
@@ -547,7 +639,6 @@ public class Board : MonoBehaviour
                 }
             }
         }
-
         StartGame();
     }
 
@@ -626,6 +717,119 @@ public class Board : MonoBehaviour
         VertSumList.GetComponent<RectTransform>().sizeDelta = new Vector2(125, Num * 150);
     }
 
+    private void Undo()
+    {
+
+        currentUndoNum++;
+        if(currentUndoNum > 4)
+        {
+            UndoButton.GetComponent<Button>().enabled = false;
+            UndoButton.transform.GetChild(0).gameObject.SetActive(false);
+            UndoButton.transform.GetChild(1).gameObject.SetActive(true);
+            return;
+        }
+
+        Dice swap_dice = previousSwappedDice[0];
+        Dice dice = previousSwappedDice[1];
+
+
+        if (dice.slotsolution == dice.diceNumber)
+        {
+            dice.GetComponent<BoxCollider2D>().enabled = true;
+            lineSolutionList[dice.slotPos[1]].Add(dice.diceNumber);
+            lineSolutionList[dice.slotPos[0] + Num].Add(dice.diceNumber);
+            dice.matched = false;
+            matched--;
+
+
+        }
+        if (swap_dice.slotsolution == swap_dice.diceNumber)
+        {
+            swap_dice.GetComponent<BoxCollider2D>().enabled = true;
+            lineSolutionList[swap_dice.slotPos[1]].Add(swap_dice.diceNumber);
+            lineSolutionList[swap_dice.slotPos[0] + Num].Add(swap_dice.diceNumber);
+            matched--;
+            swap_dice.matched = false;
+
+        }
+
+        Vector2 posTemp = swap_dice.initialPos;
+        swap_dice.initialPos = dice.initialPos;
+        dice.initialPos = posTemp;
+
+        Vector2Int slotTemp = swap_dice.slotPos;
+        swap_dice.slotPos = dice.slotPos;
+        dice.slotPos = slotTemp;
+
+        int solTemp = swap_dice.slotsolution;
+        swap_dice.slotsolution = dice.slotsolution;
+        dice.slotsolution = solTemp;
+
+        swapped--;
+        movesText.text = (21 - swapped).ToString();
+
+        ActionEvents.UpdateGameState(dice.slotPos[0] * Num + dice.slotPos[1], swap_dice.slotPos[0] * Num + swap_dice.slotPos[1]);
+
+        CheckColor();
+
+        gamePlayParticle.SwapDices(dice,swap_dice,null,5,4);
+
+
+        UndoButton.GetComponent<Button>().enabled = false;
+        UndoButton.transform.GetChild(0).gameObject.SetActive(false);
+        UndoButton.transform.GetChild(1).gameObject.SetActive(true);
+
+    }
+
+
+    private void Hint()
+    {
+        currentHintNum++ ;
+        if(currentHintNum > 4)
+        {
+            HintButton.GetComponent<Button>().enabled = false;
+            HintButton.transform.GetChild(0).gameObject.SetActive(false);
+            HintButton.transform.GetChild(1).gameObject.SetActive(true);
+            return;
+        }
+
+        Dice[] HintDice = makeHint();
+        hand.waypoint_1 = HintDice[0].transform;
+        hand.waypoint_2 = HintDice[1].transform;
+        hand.ResetMovement();
+        hand.StartAnimation();
+        hand.gameObject.SetActive(true);
+
+        HintButton.GetComponent<Button>().enabled = false;
+        HintButton.transform.GetChild(0).gameObject.SetActive(false);
+        HintButton.transform.GetChild(1).gameObject.SetActive(true);
+    }
+
+
+    Dice[] makeHint()
+    {
+        Dice[] hintDice = new Dice[2];
+        foreach(Dice dice in diceList)
+        {
+            if(!dice.matched)
+            {
+                hintDice[0]= dice;
+                break;
+            }
+        }
+
+        foreach(Dice dice in diceList)
+        {
+            if(dice.slotsolution == hintDice[0].diceNumber && !dice.matched)
+            {
+                hintDice[1] = dice;
+                break;
+            }
+        }
+
+        return hintDice;
+    }
+
 
     IEnumerator Timer()
     {
@@ -642,6 +846,8 @@ public class Board : MonoBehaviour
     {
         ActionEvents.swapDice -= SwapDice;
         ActionEvents.SendGameData -= ReceiveGameData;
+        ActionEvents.Undo -= Undo;
+        ActionEvents.Hint -= Hint;
     }
 
 }

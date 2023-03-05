@@ -100,6 +100,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 9a97b5739cc988445aaaf61d69bf9c50, type: 3}
   - {fileID: 21300000, guid: 957bd973bccb8c643951ce09ed27018f, type: 3}
   - {fileID: 21300000, guid: de7a158377176c545bb424ed46aea86c, type: 3}
+  - {fileID: 21300000, guid: 342cceb33f5fd4742bc2c370af701a33, type: 3}
   - {fileID: 21300000, guid: 19b5a6c3faed69c469b9f328eff70668, type: 3}
   - {fileID: 21300000, guid: 734197c3a726bcc42b8366cecf2de51a, type: 3}
   - {fileID: 21300000, guid: 632b97c3d0bd3a145ad87e66593606c3, type: 3}
@@ -237,8 +238,10 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 38f5f69b419680541a7782d012d2189e, type: 3}
   - {fileID: 21300000, guid: 3f3f189b67eaae249b064091e224311d, type: 3}
   - {fileID: 21300000, guid: a63224ab4a472ad47bbc0b57c82fed44, type: 3}
+  - {fileID: 21300000, guid: 16d1b7abe644f134892aea91f81d13a6, type: 3}
   - {fileID: 21300000, guid: f16640db78d69b34f86e7459ad7dee43, type: 3}
   - {fileID: 21300000, guid: ad73d0dbd2d0a344d93e8ee06cb39d34, type: 3}
+  - {fileID: 21300000, guid: b0e5c6ebd865dd342934ed2f5459dce5, type: 3}
   - {fileID: 21300000, guid: f72bdaebc9824664082ebaee81836255, type: 3}
   - {fileID: 21300000, guid: 49c6531cdfd70c34ca94e27025cb3b88, type: 3}
   - {fileID: 21300000, guid: 37fb0b1c22f63404ca5f3d6fcf4cde9c, type: 3}
@@ -347,6 +350,7 @@ SpriteAtlas:
   - D
   - White_3
   - Shop_Icon_BG
+  - Hint_unavailable
   - StatsIcon
   - pack 3
   - yellow_3
@@ -484,8 +488,10 @@ SpriteAtlas:
   - Profile_back_bg2
   - moves_back_bg
   - Empty_box
+  - undo_unavailable
   - White_5
   - pack free
+  - LevelIcon_failed
   - PiggyBankUnlocked
   - Profile_back_bg
   - plus_icon

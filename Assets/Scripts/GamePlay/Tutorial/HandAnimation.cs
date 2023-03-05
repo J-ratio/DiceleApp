@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class HandAnimation : MonoBehaviour
 {
-    [SerializeField] private Transform waypoint_1;
+    [SerializeField] public Transform waypoint_1;
 
-    [SerializeField] private Transform waypoint_2;
+    [SerializeField] public Transform waypoint_2;
 
     [SerializeField] private Animator handAnimation;
 
@@ -32,9 +32,9 @@ public class HandAnimation : MonoBehaviour
         Show();
     }
 
-    private void StopAnimation() => transform.GetChild(0).gameObject.SetActive(false);
+    public void StopAnimation() => transform.GetChild(0).gameObject.SetActive(false);
 
-    private void StartAnimation() => transform.GetChild(0).gameObject.SetActive(true);
+    public void StartAnimation() => transform.GetChild(0).gameObject.SetActive(true);
 
     internal void Hide() => gameObject.SetActive(false);
 
@@ -79,7 +79,7 @@ public class HandAnimation : MonoBehaviour
         }
     }
 
-    private void ResetMovement()
+    public void ResetMovement()
     {
         transform.position = waypoint_1.position;
         handAnimation.Play(handDownAnimation, 0, 0);

@@ -20,7 +20,7 @@ public class GamePlayAnimation : MonoBehaviour
 
     internal void CheckAndPlayFinalHorizontalAnimation(Action callback)
     {
-        Debug.Log("CheckAndPlayFinalHorizontalAnimation");
+        //Debug.Log("CheckAndPlayFinalHorizontalAnimation");
         //if (isFinished)
         //{
         //    isFinished = false;
@@ -50,13 +50,13 @@ public class GamePlayAnimation : MonoBehaviour
     }
     internal void CheckAndPlayHorizontalAnimation(Action callback,int rowIndex)
     {
-        Debug.Log("CheckAndPlayHorizontalAnimation");
+        //Debug.Log("CheckAndPlayHorizontalAnimation");
         AnimateHorizontalSingle(rowIndex, callback);
     }
     
     internal void CheckAndPlayVerticalAnimation(Action callback,int rowIndex)
     {
-        Debug.Log("CheckAndPlayHorizontalAnimation");
+        //Debug.Log("CheckAndPlayHorizontalAnimation");
         AnimateVerticalSingle(rowIndex, callback);
     }
     
@@ -66,7 +66,7 @@ public class GamePlayAnimation : MonoBehaviour
         AnimateHorizontalSingle(rowIndex, null);
     }
     
-    internal void CheckAndPlayVerticalAnimation(int rowIndex)
+    public void CheckAndPlayVerticalAnimation(int rowIndex)
     {
         Debug.Log("CheckAndPlayHorizontalAnimation");
         AnimateVerticalSingle(rowIndex, null);
@@ -94,7 +94,7 @@ public class GamePlayAnimation : MonoBehaviour
 
     private void Finished()
     {
-        Debug.Log("Finished");
+        //Debug.Log("Finished");
         //isFinished = true;
     }
 

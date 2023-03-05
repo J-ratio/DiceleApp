@@ -54,6 +54,7 @@ public class Dice : MonoBehaviour
     {
         initialPos = new Vector2(transform.position.x, transform.position.y);
     }
+    
     //Added by charan
     private IEnumerator ScaleObject()
     {

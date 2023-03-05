@@ -28,9 +28,11 @@ public class UIManager : MonoBehaviour
 
     //List of UI elements stored in GameScreenUI
     //0 => CoinText, 1 => DayText, 2 => MonthText, 3 => UndoChargeText, 4 => HintChargeText
-    [SerializeField] private TextMeshProUGUI[] GameScreenUI;
+    [SerializeField] public TextMeshProUGUI[] GameScreenUI;
 
-
+    //List of UI elements stored in CalanderScreenUI
+    //0 => XpText, 1 => CoinText
+    [SerializeField] private TextMeshProUGUI[] CalanderScreenUI;
 
     void OnEnable()
     {
@@ -90,7 +92,6 @@ public class UIManager : MonoBehaviour
     {
         foreach (GameObject screen in screens)
         {
-            //Debug.Log(screen.name);
             if (screen.name == name)
             {
                 screen.SetActive(false);
@@ -129,11 +130,15 @@ public class UIManager : MonoBehaviour
 
     //MainScreenUpdateFuntions
 
-    public void UpdateMainScreenStats(int xp, int coins)
+    public void UpdatePlayerStats(int xp, int coins)
     {
         MainScreenUI[0].text = xp.ToString();
         MainScreenUI[1].text = coins.ToString();
+        CalanderScreenUI[0].text = xp.ToString();
+        CalanderScreenUI[1].text = coins.ToString();
+        GameScreenUI[0].text = coins.ToString();
     }
+
 
     public void UpdateClassicLevel(int lvl)
     {
