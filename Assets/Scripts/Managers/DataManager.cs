@@ -93,7 +93,7 @@ public class DataManager : MonoBehaviour
         //_____________________________________________________________________________________________
         //retrieves the playerXp and playerCoins and ClassicLvlIndex from the database and stores them into the given variables.
         //_____________________________________________________________________________________________
-        ClassicLvlIndex = 3;
+        ClassicLvlIndex = 0;
         PlayerXp = 0;
         PlayerCoins = 5500;
         UIManager.UpdatePlayerStats(PlayerXp, PlayerCoins);
@@ -434,6 +434,10 @@ public class DataManager : MonoBehaviour
         PlayerCoins = PlayerCoins + queuedWinCase[0];
         PlayerXp = PlayerXp + queuedWinCase[1];
         UIManager.UpdatePlayerStats(PlayerXp,PlayerCoins);
+
+        //-----------------------------------------------------------------------
+        //Update Player Coins and Xp
+        //-----------------------------------------------------------------------
 
         UIManager.CloseScreen("Level_Complete_Canvas");
         UIManager.CloseScreen("Level_Failed_Canvas");
