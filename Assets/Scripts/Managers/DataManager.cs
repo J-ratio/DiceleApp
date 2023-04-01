@@ -99,6 +99,7 @@ public class DataManager : MonoBehaviour
     }
     async void Start()
     {
+        // Post Url example of how you can use the API Helper class //
         var postUrl = "https://typedwebhook.tools/webhook/f88dcdc3-19c8-40ff-a2fd-099a228ac8c8";
         MyClass myObject = new MyClass();
         myObject.level = 1;
@@ -108,12 +109,17 @@ public class DataManager : MonoBehaviour
         var UserData = await ApiHelper.SendJSONData(postUrl, myObject);
         Debug.Log(UserData.response);
 
+        // End of Post Url example of how you can use the API Helper class //
+
+        // Get Url example of how you can use the API Helper class //
         var getUrl = "https://reqres.in/api/users/2";
         var GetData = await ApiHelper.RequestJSONData(getUrl);
         Debug.Log(GetData.response);
         
         GetResponse r = JsonUtility.FromJson<GetResponse>(GetData.response);
         Debug.Log(JsonUtility.ToJson(r.data));
+
+        // End of Get Url example of how you can use the API Helper class //
 
         DayNum = (DateTime.Now - StartDate).Days;
         MonthNum = (DateTime.Now.Month - StartDate.Month) + 12 * (DateTime.Now.Year - StartDate.Year);
