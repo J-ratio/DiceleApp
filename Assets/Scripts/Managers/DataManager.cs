@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
-
+using System.Threading.Tasks;
 public class DataManager : MonoBehaviour
 {
 
@@ -67,8 +67,53 @@ public class DataManager : MonoBehaviour
     }
 
 
-    void Start()
+    [Serializable]
+    public class MyClass
     {
+        public int level;
+        public float timeElapsed;
+        public string playerName;
+    }
+
+    [Serializable]
+    public class DataObjectInGetResponse
+    {
+        public string id;
+        public string email;
+        public string first_name;
+        public string last_name;
+        public string avatar;
+    }
+
+    [Serializable]
+    public class SupportObjectInGetResponse
+    {
+        public string url;
+        public string text;
+    }
+
+    [Serializable]
+    public class GetResponse {
+        public DataObjectInGetResponse data;
+        public SupportObjectInGetResponse support;
+    }
+    async void Start()
+    {
+        var postUrl = "https://typedwebhook.tools/webhook/f88dcdc3-19c8-40ff-a2fd-099a228ac8c8";
+        MyClass myObject = new MyClass();
+        myObject.level = 1;
+        myObject.timeElapsed = 47.5f;
+        myObject.playerName = "Dr Charles Francis";
+
+        var UserData = await ApiHelper.SendJSONData(postUrl, myObject);
+        Debug.Log(UserData.response);
+
+        var getUrl = "https://reqres.in/api/users/2";
+        var GetData = await ApiHelper.RequestJSONData(getUrl);
+        Debug.Log(GetData.response);
+        
+        GetResponse r = JsonUtility.FromJson<GetResponse>(GetData.response);
+        Debug.Log(JsonUtility.ToJson(r.data));
 
         DayNum = (DateTime.Now - StartDate).Days;
         MonthNum = (DateTime.Now.Month - StartDate.Month) + 12 * (DateTime.Now.Year - StartDate.Year);
@@ -155,7 +200,7 @@ public class DataManager : MonoBehaviour
 
 
         //Sends the Lists to gameBoard
-        ActionEvents.SendGameData(solList, spawnList, 0 , isDaily);
+        ActionEvents.SendGameData(solList, spawnList, 0, isDaily);
 
 
     }
@@ -176,7 +221,7 @@ public class DataManager : MonoBehaviour
 
         currStateList = new List<int>(spawnList);
 
-        UIManager.UpdateGameScreen(PlayerCoins, ClassicLvlIndex+1, "Level" , 100, 50);
+        UIManager.UpdateGameScreen(PlayerCoins, ClassicLvlIndex + 1, "Level", 100, 50);
 
         //Opens the game canvas
         UIManager.OpenScreen("GamePlay_Canvas");
@@ -199,16 +244,16 @@ public class DataManager : MonoBehaviour
 
     private void MakeTrophyList(List<int> movesList)
     {
-        
+
     }
 
 
-    public void Undo() 
+    public void Undo()
     {
-        int[] CoinOptions = {50,100,300};
-        int requiredCoins = CoinOptions[currentUndoNum>2?2:currentUndoNum];
+        int[] CoinOptions = { 50, 100, 300 };
+        int requiredCoins = CoinOptions[currentUndoNum > 2 ? 2 : currentUndoNum];
 
-        if(PlayerCoins < requiredCoins)
+        if (PlayerCoins < requiredCoins)
         {
             UIManager.OpenScreen("In app_coin_Canvas");
             return;
@@ -216,7 +261,7 @@ public class DataManager : MonoBehaviour
 
         //Debug.Log("Checking...");
 
-        if(currentUndoNum<3)
+        if (currentUndoNum < 3)
         {
             //Debug.Log("Swapping...");
             currentUndoNum++;
@@ -225,39 +270,39 @@ public class DataManager : MonoBehaviour
             //-----------------------------------------------------------------------
             //Update Player Coins
             //-----------------------------------------------------------------------
-            UIManager.GameScreenUI[3].text = CoinOptions[currentUndoNum>1?2:currentUndoNum].ToString();
+            UIManager.GameScreenUI[3].text = CoinOptions[currentUndoNum > 1 ? 2 : currentUndoNum].ToString();
             ActionEvents.Undo();
         }
-        
+
     }
 
 
 
     public void Hint()
     {
-        int[] CoinOptions = {100,200,500,1000};
-        int requiredCoins = CoinOptions[currentHintNum>3?3:currentHintNum];
+        int[] CoinOptions = { 100, 200, 500, 1000 };
+        int requiredCoins = CoinOptions[currentHintNum > 3 ? 3 : currentHintNum];
 
-        if(PlayerCoins < requiredCoins)
+        if (PlayerCoins < requiredCoins)
         {
             UIManager.OpenScreen("In app_coin_Canvas");
             return;
         }
 
-        if(currentHintNum<4)
+        if (currentHintNum < 4)
         {
             currentHintNum++;
             PlayerCoins = PlayerCoins - requiredCoins;
-            UIManager.UpdatePlayerStats(PlayerXp,PlayerCoins);
+            UIManager.UpdatePlayerStats(PlayerXp, PlayerCoins);
             //-----------------------------------------------------------------------
             //Update Player Coins
             //-----------------------------------------------------------------------
-            UIManager.GameScreenUI[4].text = CoinOptions[currentHintNum>2?3:currentHintNum].ToString();
+            UIManager.GameScreenUI[4].text = CoinOptions[currentHintNum > 2 ? 3 : currentHintNum].ToString();
 
             ActionEvents.Hint();
         }
 
-        
+
     }
 
 
@@ -359,7 +404,7 @@ public class DataManager : MonoBehaviour
         //_____________________________________________________________________________________________
         //stores -1 in DataBase's moveslist at position gameIndex
         //_____________________________________________________________________________________________
-        if(isDaily)
+        if (isDaily)
         {
             MovesList[gameIndex] = -1;
         }
@@ -424,7 +469,7 @@ public class DataManager : MonoBehaviour
         {
             UIManager.OpenScreen("Main_Menu_Canvas");
             ClassicLvlIndex++;
-            UIManager.UpdateClassicLevel(ClassicLvlIndex+1);
+            UIManager.UpdateClassicLevel(ClassicLvlIndex + 1);
             //_____________________________________________________________________________________________
             //updates the currentClassicLvl variable for the given playerID
             //_____________________________________________________________________________________________
@@ -433,7 +478,7 @@ public class DataManager : MonoBehaviour
 
         PlayerCoins = PlayerCoins + queuedWinCase[0];
         PlayerXp = PlayerXp + queuedWinCase[1];
-        UIManager.UpdatePlayerStats(PlayerXp,PlayerCoins);
+        UIManager.UpdatePlayerStats(PlayerXp, PlayerCoins);
 
         //-----------------------------------------------------------------------
         //Update Player Coins and Xp
@@ -443,7 +488,7 @@ public class DataManager : MonoBehaviour
         UIManager.CloseScreen("Level_Failed_Canvas");
 
 
-        if(isDaily || (ClassicLvlIndex!=1 && ClassicLvlIndex!=2))
+        if (isDaily || (ClassicLvlIndex != 1 && ClassicLvlIndex != 2))
         {
             coinAnim.AddCoins();
         }
