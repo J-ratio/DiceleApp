@@ -17,10 +17,10 @@ MonoBehaviour:
   tutorialTypes:
   - dice_1: 1
     dice_2: 4
-    message: <size=120%><#E74E81>Hello Iam Dicey!</color></size>\nSwap dice to add
+    message: <size=120%><#E74E81>Hello I am Dicey!</color></size>\nSwap dice to add
       up to sum of row and column
     icon: {fileID: 21300000, guid: 019e84f028dfbd842ab38332dea65185, type: 3}
   tutorialFinishType:
-    message: <size=120%><#E74E81>Hello Iam Dicey!</color></size>\nSwap dice to add
+    message: <size=120%><#E74E81>Hello I am Dicey!</color></size>\nSwap dice to add
       up to sum of row and column
     icon: {fileID: 21300000, guid: 019e84f028dfbd842ab38332dea65185, type: 3}

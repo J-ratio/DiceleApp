@@ -29,8 +29,8 @@ public static class ApiHelper
         {
             HttpClient client = new HttpClient();
             StringContent content = new StringContent(JsonUtility.ToJson(json), Encoding.UTF8, "application/json");
-
             HttpResponseMessage response = await client.PostAsync(uri, content);
+
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();

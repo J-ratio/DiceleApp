@@ -70,6 +70,16 @@ public class Board : MonoBehaviour
     public bool isTutorial;
     //...
 
+
+    public AudioSource winSound;
+    public AudioSource loseSound;
+    public AudioSource swapSound;
+    public AudioSource undoSound;
+    public AudioSource gameWinSound;
+    public AudioSource matchSound;
+    public AudioSource greenDiceSound;
+
+
     void OnEnable()
     {
         ActionEvents.swapDice += SwapDice;
@@ -94,7 +104,7 @@ public class Board : MonoBehaviour
         CreateLineSolutionList();
         CreateDice();
         StartCoroutine("Timer");
-        movesText.text = (21 - swapped).ToString();
+        movesText.text = (Num*Num - emptySlots.Count - swapped).ToString();
         currentUndoNum = 0;
         currentHintNum = 0;
 
@@ -380,10 +390,18 @@ public class Board : MonoBehaviour
                     dice.boxCollider.enabled = false;
                     lineSolutionList[dice.slotPos[1]].Remove(dice.diceNumber);
                     lineSolutionList[dice.slotPos[0] + Num].Remove(dice.diceNumber);
+
+                    if(lineSolutionList[dice.slotPos[1]].Count(x => x != -1) == 0)
+                    {
+                        HorSumList.transform.GetChild(dice.slotPos[1]).GetComponent<Animator>().enabled = true;
+                    }
+
+                    if(lineSolutionList[dice.slotPos[0]+Num].Count(x => x != -1) == 0)
+                    {
+                        VertSumList.transform.GetChild(dice.slotPos[0]).GetComponent<Animator>().enabled = true;
+                    }
+                    
                     matched++;
-
-                    LogLineSol();
-
                     dice.matched = true;
                 }
             }
@@ -465,10 +483,9 @@ public class Board : MonoBehaviour
         }
         else
         {
-            //Commented by charan
-            //StartCoroutine(MoveTowardsTarget(swap_dice, dice.GetInitialPos(), 10));
-            //StartCoroutine(MoveTowardsTarget(dice, swap_dice.GetInitialPos(), 10));
-            //...
+            
+            playSwapSound();
+
             Vector2 posTemp = swap_dice.initialPos;
             swap_dice.initialPos = dice.initialPos;
             dice.initialPos = posTemp;
@@ -481,6 +498,7 @@ public class Board : MonoBehaviour
             swap_dice.slotsolution = dice.slotsolution;
             dice.slotsolution = solTemp;
 
+
             if (dice.slotsolution == dice.diceNumber)
             {
                 dice.spriteRenderer.sprite = greenDiceImages[dice.diceNumber];
@@ -488,22 +506,19 @@ public class Board : MonoBehaviour
                 dice.GetComponent<BoxCollider2D>().enabled = false;
                 lineSolutionList[dice.slotPos[1]].Remove(dice.diceNumber);
                 lineSolutionList[dice.slotPos[0] + Num].Remove(dice.diceNumber);
-                //LogLineSol();
                 dice.matched = true;
                 matched++;
 
-                List<int> tempList1 = new List<int>(lineSolutionList[dice.slotPos[1]]);
-                tempList1.RemoveAll( x => x == -1);
-                if(tempList1.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                if(lineSolutionList[dice.slotPos[1]].Count(x => x != -1) == 0)
                 {
-                    playAnimation.CheckAndPlayVerticalAnimation(dice.slotPos[1]);
+                    HorSumList.transform.GetChild(dice.slotPos[1]).GetComponent<Animator>().enabled = true;
+                    if(matched < Num*Num - emptySlots.Count - 1) playMatchSound();
                 }
-                List<int> tempList2 = new List<int>(lineSolutionList[dice.slotPos[0]+Num]);
-                tempList2.RemoveAll(x => x == -1);
-                if(tempList2.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+
+                if(lineSolutionList[dice.slotPos[0]+Num].Count(x => x != -1) == 0)
                 {
-                    playAnimation.CheckAndPlayHorizontalAnimation(dice.slotPos[0]);
-                    Debug.Log(dice.slotPos[0]);
+                    VertSumList.transform.GetChild(dice.slotPos[0]).GetComponent<Animator>().enabled = true;
+                    if(matched < Num*Num - emptySlots.Count - 1) playMatchSound();
                 }
             }
             if (swap_dice.slotsolution == swap_dice.diceNumber)
@@ -513,24 +528,24 @@ public class Board : MonoBehaviour
                 swap_dice.GetComponent<BoxCollider2D>().enabled = false;
                 lineSolutionList[swap_dice.slotPos[1]].Remove(swap_dice.diceNumber);
                 lineSolutionList[swap_dice.slotPos[0] + Num].Remove(swap_dice.diceNumber);
-                //LogLineSol();
+
                 matched++;
                 swap_dice.matched = true;
-
-                List<int> tempList1 = new List<int>(lineSolutionList[swap_dice.slotPos[1]]);
-                tempList1.RemoveAll(x => x == -1);
-                if(tempList1.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                
+                if(lineSolutionList[swap_dice.slotPos[1]].Count(x => x != -1) == 0)
                 {
-                    playAnimation.CheckAndPlayVerticalAnimation(swap_dice.slotPos[1]);
+                    HorSumList.transform.GetChild(swap_dice.slotPos[1]).GetComponent<Animator>().enabled = true;
+                    if(matched < Num*Num - emptySlots.Count - 1) playMatchSound();
                 }
-                List<int> tempList2 = new List<int>(lineSolutionList[swap_dice.slotPos[0]+Num]);
-                tempList2.RemoveAll(x => x == -1);
-                if(tempList2.Count == 0 && matched < Num * Num - emptySlots.Count - 2)
+                
+                if(lineSolutionList[swap_dice.slotPos[0]+Num].Count(x => x != -1) == 0)
                 {
-                    playAnimation.CheckAndPlayHorizontalAnimation(swap_dice.slotPos[0]);
-                    Debug.Log(swap_dice.slotPos[0]);
+                    VertSumList.transform.GetChild(swap_dice.slotPos[0]).GetComponent<Animator>().enabled = true;
+                    if(matched < Num*Num - emptySlots.Count - 1) playMatchSound();
                 }
             }
+
+            //LogLineSol();
 
             swapped++;
 
@@ -548,7 +563,7 @@ public class Board : MonoBehaviour
                 HintButton.transform.GetChild(1).gameObject.SetActive(false);
             }
 
-            movesText.text = (21 - swapped).ToString();
+            movesText.text = (Num*Num - emptySlots.Count - swapped).ToString();
 
             ActionEvents.UpdateGameState(dice.slotPos[0] * Num + dice.slotPos[1], swap_dice.slotPos[0] * Num + swap_dice.slotPos[1]);
 
@@ -567,6 +582,8 @@ public class Board : MonoBehaviour
                 {
                     UndoButton.GetComponent<Button>().enabled = false;
                     HintButton.GetComponent<Button>().enabled = false;
+
+                    playGameWinSound();
 
                     playAnimation.CheckAndPlayFinalHorizontalAnimation(VerticleAlso);
                     isTutorial = false;
@@ -595,13 +612,17 @@ public class Board : MonoBehaviour
 
     public void GameWin()
     {
+        playLevelWinSound();
         ClearDice();
+        lineSolutionList.Clear();
         ActionEvents.TriggerGameWinEvent(swapped, time);
     }
 
     private void GameLose()
     {
+        playLevelLoseSound();
         ClearDice();
+        lineSolutionList.Clear();
         ActionEvents.TriggerGameLoseEvent();
     }
 
@@ -613,7 +634,7 @@ public class Board : MonoBehaviour
         swapped = 0;
         matched = 0;
 
-        if (actionIndex == 1)   swapped = 18;
+        if (actionIndex == 1)   swapped = Num*Num - sol.Count(x => x == -1) - 3;
 
         solArray.Clear();
         spawnArray.Clear();
@@ -712,9 +733,14 @@ public class Board : MonoBehaviour
 
     private void SetSize()
     {
+        Vector2 horizontalInitPos = new Vector2(-50, -380);
+        Vector2 verticleInitPos = new Vector2(395,100);
         GetComponent<RectTransform>().sizeDelta = new Vector2(Num * 150, Num * 150);
         HorSumList.GetComponent<RectTransform>().sizeDelta = new Vector2(Num * 150, 125);
         VertSumList.GetComponent<RectTransform>().sizeDelta = new Vector2(125, Num * 150);
+        HorSumList.GetComponent<RectTransform>().anchoredPosition = new Vector2(horizontalInitPos.x, horizontalInitPos.y + 80*(5 - Num));
+        VertSumList.GetComponent<RectTransform>().anchoredPosition = new Vector2(verticleInitPos.x - 80*(5 - Num), verticleInitPos.y );
+
     }
 
     private void Undo()
@@ -728,6 +754,8 @@ public class Board : MonoBehaviour
             UndoButton.transform.GetChild(1).gameObject.SetActive(true);
             return;
         }
+
+        playUndoSound();
 
         Dice swap_dice = previousSwappedDice[0];
         Dice dice = previousSwappedDice[1];
@@ -766,7 +794,7 @@ public class Board : MonoBehaviour
         dice.slotsolution = solTemp;
 
         swapped--;
-        movesText.text = (21 - swapped).ToString();
+        movesText.text = (Num*Num - emptySlots.Count - swapped).ToString();
 
         ActionEvents.UpdateGameState(dice.slotPos[0] * Num + dice.slotPos[1], swap_dice.slotPos[0] * Num + swap_dice.slotPos[1]);
 
@@ -848,6 +876,48 @@ public class Board : MonoBehaviour
         ActionEvents.SendGameData -= ReceiveGameData;
         ActionEvents.Undo -= Undo;
         ActionEvents.Hint -= Hint;
+    }
+
+
+    void playGameWinSound()
+    {
+        gameWinSound.Play();
+        Invoke("playSecondtime", 1.0f*Num/4);
+    }
+
+    void playSecondtime()
+    {
+        gameWinSound.Play();
+    }
+
+    void playLevelLoseSound()
+    {
+        loseSound.Play();
+    }
+
+    void playLevelWinSound()
+    {
+        winSound.Play();
+    }
+
+    void playMatchSound()
+    {
+        matchSound.Play();
+    }
+
+    void playSwapSound()
+    {
+        swapSound.Play();
+    }
+
+    void playUndoSound()
+    {
+        undoSound.Play();
+    }
+
+    void playGreenDiceSound()
+    {
+        greenDiceSound.Play();
     }
 
 }

@@ -366,8 +366,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <size=120%><#E74E81>Hello Iam Dicey!</color></size>\nSwap dice to add up
-    to sum of row and column
+  m_text: <size=120%><#E74E81>Hello I am Dicey!</color></size>\nSwap dice to add
+    up to sum of row and column
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e192b534d005c2443aed2f4fd0040922, type: 2}
   m_sharedMaterial: {fileID: 3651397831492119060, guid: e192b534d005c2443aed2f4fd0040922, type: 2}

@@ -17,13 +17,13 @@ MonoBehaviour:
   tutorialTypes:
   - dice_1: 1
     dice_2: 3
-    message: <sprite=0><size=120%><#E74E81>Nice Dice!</color></size>\nYellow dice
-      means that the dice in same row and column
+    message: <sprite=0><size=120%>Yellow dice means that the dice is either in same
+      row or same column
     icon: {fileID: 21300000, guid: 019e84f028dfbd842ab38332dea65185, type: 3}
   - dice_1: 3
     dice_2: 9
-    message: Great now <sprite=1><sprite=2> are both yellow.that means they are in
-      same column
+    message: <size=120%> Great! now <sprite=1><sprite=2> are both yellow. that means
+      they are in same column
     icon: {fileID: 21300000, guid: 019e84f028dfbd842ab38332dea65185, type: 3}
   tutorialFinishType:
     message: ok done

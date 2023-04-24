@@ -11,6 +11,7 @@ public class Calander : MonoBehaviour
     private DateTime StartDate = new DateTime(2023,1,10);
     private List<int> StateList = new List<int>();
     private List<int> StarsList = new List<int>();
+    private List<int> MonthlyStarsList = new List<int>();
 
     [SerializeField]
     private TextMeshProUGUI goldCheckPointTxt;
@@ -20,6 +21,8 @@ public class Calander : MonoBehaviour
     private TextMeshProUGUI ButtonDayTxt;
     [SerializeField]
     private Button DailyDicele;
+    [SerializeField]
+    private Slider TrophySlider;
 
     /// <summary>
     /// Cell or slot in the calendar. All the information each day should now about itself
@@ -60,7 +63,12 @@ public class Calander : MonoBehaviour
                 dayRef.DayStates[j].SetActive(false);
             }
 
-            if(state>=0)    dayRef.DayStates[state].SetActive(true);
+            if(state>=0){
+
+                dayRef.DayStates[4].SetActive(false);
+                dayRef.DayStates[state].SetActive(true);
+            }
+
 
             if(state == 2)    dayRef.starText.text = bestStarCount.ToString();
             
@@ -96,16 +104,19 @@ public class Calander : MonoBehaviour
 
     public DateTime currDate = DateTime.Now;
 
-
     private void OnEnable()
     {
         ActionEvents.StartCalander += StartCalander;
+        ActionEvents.SendTrophyList += GetTrohpyList;
         DailyDicele.onClick.AddListener(delegate { StartLevel((DateTime.Now - StartDate).Days);});
     }
 
 
     void StartCalander(List<int> MovesList)
     {
+        StateList.Clear();
+        StarsList.Clear();
+        
         for(int i = 0; i < MovesList.Count; i ++)
         {
             if(MovesList[i] == -2 )
@@ -141,6 +152,8 @@ public class Calander : MonoBehaviour
         int endDay = GetTotalNumberOfDays(year, month);
 
         goldCheckPointTxt.text = ((endDay - 1)*5).ToString();
+        TrophySlider.value = GetSliderValue(((currDate.Year - StartDate.Year) * 12 + currDate.Month - StartDate.Month), (endDay - 1)*5);
+
         ///Create the days
         ///This only happens for our first Update Calendar when we have no Day objects therefore we must create them
 
@@ -158,7 +171,7 @@ public class Calander : MonoBehaviour
                     }
                     else
                     {
-                        if(DateTime.Compare(new DateTime(year,month,currDay - startDay + 1),StartDate) > 0 && DateTime.Compare(new DateTime(year,month,currDay - startDay + 1),DateTime.Now) <= 0){
+                        if(DateTime.Compare(new DateTime(year,month,currDay - startDay + 1),StartDate) >= 0 && DateTime.Compare(new DateTime(year,month,currDay - startDay + 1),DateTime.Now) <= 0){
                             int tempIndex = (new DateTime(year,month,currDay - startDay + 1) - StartDate).Days;
                             newDay = new Day(currDay - startDay, StateList[tempIndex],StarsList[tempIndex],weeks[w].GetChild(i).gameObject);
                             weeks[w].GetChild(i).gameObject.GetComponent<Button>().enabled = true;
@@ -194,7 +207,7 @@ public class Calander : MonoBehaviour
                 }
                 else
                 {
-                    if(DateTime.Compare(new DateTime(year,month,i - startDay + 1),StartDate) > 0 && DateTime.Compare(new DateTime(year,month,i - startDay + 1),DateTime.Now) <= 0)
+                    if(DateTime.Compare(new DateTime(year,month,i - startDay + 1),StartDate) >= 0 && DateTime.Compare(new DateTime(year,month,i - startDay + 1),DateTime.Now) <= 0)
                     {
                         DateTime tempD =  new DateTime(year,month,i - startDay + 1);
                         days[i].UpdateState(StateList[(tempD - StartDate).Days],StarsList[(tempD - StartDate).Days]);
@@ -221,6 +234,35 @@ public class Calander : MonoBehaviour
     }
 
 
+    float GetSliderValue(int index, int TotalStars)
+    {
+        if(index < MonthlyStarsList.Count && index >= 0)
+        {
+            if(MonthlyStarsList[index] < 15) return (MonthlyStarsList[index]/15f)*0.33f;
+            else if(MonthlyStarsList[index] < 60) return ((MonthlyStarsList[index]-15)/45f)*0.33f + 0.33f;
+            else return ((float)(MonthlyStarsList[index]-60)/(TotalStars-60))*0.33f + 0.66f;
+        }
+        else
+        {
+            return 0;
+        }
+
+    }
+
+
+    void LogList(List<int> List)
+    {
+        string s = "";
+
+        foreach( int i in List)
+        {
+            s += i + " ";
+        }
+
+        Debug.Log(s);
+    }
+
+
     void RemoveListeners()
     {
         for (int w = 0; w < 6; w++)
@@ -236,7 +278,6 @@ public class Calander : MonoBehaviour
 
     void StartLevel(int Num)
     {
-        Debug.Log(Num);
         ActionEvents.StartLvl(Num);
     }
 
@@ -288,9 +329,23 @@ public class Calander : MonoBehaviour
     }
 
 
+    void GetTrohpyList(List<int> List)
+    {
+        MonthlyStarsList.Clear();
+
+        for(int i = 0; i < List.Count; i++)
+        {
+            MonthlyStarsList.Add(List[i]);
+        }
+
+        LogList(List);
+    }
+
+
     void OnDisable()
     {
         ActionEvents.StartCalander -= StartCalander;
+        ActionEvents.SendTrophyList -= GetTrohpyList;
         DailyDicele.onClick.RemoveAllListeners();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Linq;
 
 public class UIManager : MonoBehaviour
@@ -18,7 +19,7 @@ public class UIManager : MonoBehaviour
 
 
     //List of UI elements stored in MainScreenUI
-    //0 => XpText, 1 => CoinsText, 2 => MonthText, 3 => DayText, 4 => ClassicLevelText
+    //0 => XpText, 1 => CoinsText, 2 => MonthText, 3 => DayText, 4 => ClassicLevelText, 5 => ProfileXpText
     [SerializeField] private TextMeshProUGUI[] MainScreenUI;
 
     [SerializeField] private TextMeshProUGUI title;
@@ -33,6 +34,21 @@ public class UIManager : MonoBehaviour
     //List of UI elements stored in CalanderScreenUI
     //0 => XpText, 1 => CoinText
     [SerializeField] private TextMeshProUGUI[] CalanderScreenUI;
+
+
+    //List of UI elements stored in Stats Screen
+    //0 => GamesPlayed, 1 => BestRank, 2 => CurrentStreak, 3 => BestStreak, 4 => TotalStars, 5 => Win%, 6 => Average Score, 7 => Best Score
+    [SerializeField] private TextMeshProUGUI[] StatsScreenUI;
+
+    //PiggyScreenTexts
+    //0 => winAwaytext, 1 =>yetToWinText , 2  => winGoldText, 3 => lostWinsWayText, 4 => LoseGoldText
+    [SerializeField]  private TextMeshProUGUI[] PiggyScreenUI;
+
+    [SerializeField] TextMeshProUGUI[] UserNameText;
+    [SerializeField] public TMP_InputField UserNameInputText;
+
+    [SerializeField] GameObject[] Avatars;
+    [SerializeField] Image Avatar;
 
     void OnEnable()
     {
@@ -133,6 +149,7 @@ public class UIManager : MonoBehaviour
     public void UpdatePlayerStats(int xp, int coins)
     {
         MainScreenUI[0].text = xp.ToString();
+        MainScreenUI[5].text = xp.ToString();
         MainScreenUI[1].text = coins.ToString();
         CalanderScreenUI[0].text = xp.ToString();
         CalanderScreenUI[1].text = coins.ToString();
@@ -155,6 +172,67 @@ public class UIManager : MonoBehaviour
         GameScreenUI[2].text = MonthStr;
         GameScreenUI[3].text = UndoCharge.ToString();
         GameScreenUI[4].text = HintCharge.ToString();
+    }
+
+
+    public void UpdateStatsScreenUI(int[] StatsArr)
+    {
+        for(int i = 0; i < StatsArr.Count(); i++)
+        {
+            StatsScreenUI[i].text = StatsArr[i].ToString(); 
+        }
+    }
+
+
+    public void UpdateName(string name)
+    {
+        UserNameText[0].text  = name;
+        UserNameText[1].text  = name;
+        UserNameInputText.text = name;
+    }
+
+
+    public void UpdateAvatar(int num)
+    {
+        Avatar.sprite = Avatars[num].GetComponent<Image>().sprite;
+
+        for(int i = 0; i < Avatars.Count(); i++)
+        {
+            Avatars[i].transform.GetChild(0).gameObject.SetActive(false);
+        }
+
+        Avatars[num].transform.GetChild(0).gameObject.SetActive(true);
+    }
+
+
+    public void UpdatePiggyScreen(int Gold, int winsAway, int action)
+    {
+        if(action == 0)
+        {
+            PiggyScreenUI[0].text = winsAway.ToString() + " Wins to unlock,win and \ncontinue filling";
+            PiggyScreenUI[1].text = Gold.ToString();
+
+        }
+        else if(action == 1)
+        {
+            PiggyScreenUI[2].text = Gold.ToString();
+        }
+        else
+        {
+            PiggyScreenUI[3].text = "You are just " + winsAway.ToString() + " wins away to unlock" + "\nthe piggy bank" ;
+            PiggyScreenUI[4].text = Gold.ToString();
+        }
+    }
+
+
+    public void PolicyRedirect()
+    {
+        Application.OpenURL("https://docs.google.com/document/d/1MWMmddJwS2k-3Wq5ThDLexF1OQokgDFyu-0GFfg52nQ/edit?usp=sharing");
+    }
+
+    public void EmailRedirect()
+    {
+        Application.OpenURL("mailto:contact@sagacistudios.com");
     }
 
     void OnDisable()

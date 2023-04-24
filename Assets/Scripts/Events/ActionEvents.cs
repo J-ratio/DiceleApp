@@ -14,4 +14,5 @@ public static class ActionEvents
     public static Action<List<int>> StartCalander;
     public static Action Undo;
     public static Action Hint;
+    public static Action<List<int>> SendTrophyList;
 }

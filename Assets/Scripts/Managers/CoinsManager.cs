@@ -9,7 +9,7 @@ public class CoinsManager : MonoBehaviour
 	//References
 	[Header ("UI references")]
 	[SerializeField] GameObject animatedCoinPrefab;
-	[SerializeField] Transform target;
+	[SerializeField] Transform[] target;
 	[SerializeField] Vector3 collectedCoinPosition;
 
 	[Space]
@@ -26,15 +26,12 @@ public class CoinsManager : MonoBehaviour
 	[SerializeField] Ease easeType;
 	[SerializeField] float spread;
 
-	Vector3 targetPosition;
 
 
 	private int _c = 0;
 
 	void Awake ()
 	{
-		targetPosition = target.position;
-
 		//prepare pool
 		PrepareCoins ();
 	}
@@ -50,7 +47,7 @@ public class CoinsManager : MonoBehaviour
 		}
 	}
 
-	void Animate ()
+	void Animate (int temp)
 	{
 		for (int i = 0; i < maxCoins; i++) {
 			//check if there's coins in the pool
@@ -64,7 +61,7 @@ public class CoinsManager : MonoBehaviour
 
 				//animate coin to target position
 				float duration = Random.Range (minAnimDuration, maxAnimDuration);
-				coin.transform.DOMove (targetPosition, duration)
+				coin.transform.DOMove (target[temp].position, duration)
 				.SetEase (easeType)
 				.OnComplete (() => {
 					//executes whenever coin reach target position
@@ -76,8 +73,8 @@ public class CoinsManager : MonoBehaviour
 		}
 	}
 
-	public void AddCoins ()
+	public void AddCoins ( int temp)
 	{
-		Animate ();
+		Animate (temp);
 	}
 }
