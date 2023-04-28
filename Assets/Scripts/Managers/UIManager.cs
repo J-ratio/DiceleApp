@@ -209,7 +209,9 @@ public class UIManager : MonoBehaviour
     {
         if(action == 0)
         {
-            PiggyScreenUI[0].text = winsAway.ToString() + " Wins to unlock,win and \ncontinue filling";
+            if(winsAway != 1) PiggyScreenUI[0].text = winsAway.ToString() + " Wins to unlock,win and \ncontinue filling";
+            else PiggyScreenUI[0].text = winsAway.ToString() + " Win to unlock,win and \ncontinue filling";
+            
             PiggyScreenUI[1].text = Gold.ToString();
 
         }
@@ -219,7 +221,10 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            PiggyScreenUI[3].text = "You are just " + winsAway.ToString() + " wins away to unlock" + "\nthe piggy bank" ;
+            if(winsAway != 1) PiggyScreenUI[3].text = "You are just " + winsAway.ToString() + " wins away to unlock" + "\nthe piggy bank" ;
+            else PiggyScreenUI[3].text = "You are just " + winsAway.ToString() + " win away to unlock" + "\nthe piggy bank" ;
+
+
             PiggyScreenUI[4].text = Gold.ToString();
         }
     }
@@ -227,7 +232,7 @@ public class UIManager : MonoBehaviour
 
     public void PolicyRedirect()
     {
-        Application.OpenURL("https://docs.google.com/document/d/1MWMmddJwS2k-3Wq5ThDLexF1OQokgDFyu-0GFfg52nQ/edit?usp=sharing");
+        Application.OpenURL("https://dicele.com/privacy-policy.html");
     }
 
     public void EmailRedirect()

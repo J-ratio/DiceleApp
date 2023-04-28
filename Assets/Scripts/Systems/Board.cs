@@ -17,6 +17,8 @@ public class Board : MonoBehaviour
     [SerializeField]
     private GameObject HorSumList;
     [SerializeField]
+    private GameObject sumImg;
+    [SerializeField]
     private TextMeshProUGUI movesText;
     [SerializeField]
     GameObject UndoButton;
@@ -578,7 +580,7 @@ public class Board : MonoBehaviour
 
             void SwapDone()
             {
-                if (matched == Num * Num - emptySlots.Count)
+                if (matched > 0) //== Num * Num - emptySlots.Count)
                 {
                     UndoButton.GetComponent<Button>().enabled = false;
                     HintButton.GetComponent<Button>().enabled = false;
@@ -735,11 +737,13 @@ public class Board : MonoBehaviour
     {
         Vector2 horizontalInitPos = new Vector2(-50, -380);
         Vector2 verticleInitPos = new Vector2(395,100);
+        Vector2 sumInitPos = new Vector2(382,-370);
         GetComponent<RectTransform>().sizeDelta = new Vector2(Num * 150, Num * 150);
         HorSumList.GetComponent<RectTransform>().sizeDelta = new Vector2(Num * 150, 125);
         VertSumList.GetComponent<RectTransform>().sizeDelta = new Vector2(125, Num * 150);
         HorSumList.GetComponent<RectTransform>().anchoredPosition = new Vector2(horizontalInitPos.x, horizontalInitPos.y + 80*(5 - Num));
         VertSumList.GetComponent<RectTransform>().anchoredPosition = new Vector2(verticleInitPos.x - 80*(5 - Num), verticleInitPos.y );
+        sumImg.GetComponent<RectTransform>().anchoredPosition = new Vector2(sumInitPos.x - 80*(5 - Num), sumInitPos.y + 80*(5 - Num));
 
     }
 

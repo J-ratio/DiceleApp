@@ -100,7 +100,7 @@ public class DataManager : MonoBehaviour
     class ScoreClass
     {
         public int score;
-        public string diceleID;
+        public string diceleId;
     }
 
 
@@ -420,6 +420,9 @@ public class DataManager : MonoBehaviour
     async void Start()
     {  
 
+        
+        bool isFirstTime = false;
+
         DayNum = (DateTime.Now - StartDate).Days;
         MonthNum = (DateTime.Now.Month - StartDate.Month) + 12 * (DateTime.Now.Year - StartDate.Year);
 
@@ -427,6 +430,8 @@ public class DataManager : MonoBehaviour
         ScoreList = new List<int>(DayNum + 1);
         MovesList = new List<int>(DayNum + 1);
         TrophyList = new List<int>(MonthNum);
+
+        Debug.Log("Started");
         
         //login user
         IdClass Object = new IdClass();
@@ -446,6 +451,7 @@ public class DataManager : MonoBehaviour
 
         if(UserData.info.scoreList.Count() == 0)
         {
+            isFirstTime = true;
             ScoreList = Enumerable.Repeat(0, DayNum + 1).ToList();
             MovesList = Enumerable.Repeat(-2, DayNum + 1).ToList();
 
@@ -496,6 +502,8 @@ public class DataManager : MonoBehaviour
                     await ApiHelper.SendJSONData(postURL+userProfileURL+updateStatsURL, Object1);
                     //______________
                 }
+
+                
             }
 
             for(var i = 0; i < DayNum+1; i++)
@@ -523,6 +531,8 @@ public class DataManager : MonoBehaviour
 
             temp0 = await ApiHelper.SendJSONData(postURL + userProfileURL + updateStatsURL, Object0);
             UserData = JsonUtility.FromJson<GetResponse>(temp0.response);
+
+            Debug.Log("passed init2");
             
         }
 
@@ -556,7 +566,12 @@ public class DataManager : MonoBehaviour
         UpdateStats();
         slider.SetSliderToFull();
 
+
+        Debug.Log("passed");
+
         
+
+        if(isFirstTime) StartClassicLvl();
 
     }
 
@@ -951,22 +966,25 @@ public class DataManager : MonoBehaviour
             //fetches the rank for the above score value
 
             var temp = await ApiHelper.RequestJSONData(getURL+userDailyDataURL);
+            Debug.Log(temp.response);
             GetDailyResponse UserDailyData = JsonUtility.FromJson<GetDailyResponse>(temp.response);
             int tempScore = UserDailyData.info.score;
             string diceleID = UserDailyData.info.dicele._id;
+            Debug.Log(diceleID);
 
 
             ScoreClass Object = new ScoreClass();
             Object.score = score;
-            Object.diceleID = diceleID;
-            await ApiHelper.SendJSONData(postURL+userDailyDataURL, Object);
+            Object.diceleId = diceleID;
+            var t = await ApiHelper.SendJSONData(postURL+userDailyDataURL, Object);
+            Debug.Log(t.response);
 
 
             temp = await ApiHelper.RequestJSONData(getURL+userDailyLeaderboardsURL);
             GetRankResponse UserDailyData0 = JsonUtility.FromJson<GetRankResponse>(temp.response);
 
             Object.score = tempScore;
-            Object.diceleID = diceleID;
+            Object.diceleId = diceleID;
             await ApiHelper.SendJSONData(postURL+userDailyDataURL, Object);
             //_____________________________________________________________________________________________
 
@@ -1075,9 +1093,32 @@ public class DataManager : MonoBehaviour
         }
         else
         {
-            UIManager.OpenScreen("PiggyBankLost_Canvas");
+            UIManager.OpenScreen("Level_Failed_Canvas");
             UIManager.CloseScreen("GamePlay_Canvas");
         }
+    }
+
+
+    public void ShowPiggyLostScreen()
+    {
+
+        int winsAwayFromReward = 0;
+        int goldNum = 0;
+
+        for(int i = 0; i < piggyArr.Count(); i++)
+        {   
+            
+            if(ClassicStreak < piggyArr[i])
+            {
+                winsAwayFromReward = piggyArr[i] - ClassicStreak;
+                goldNum = ClassicStreak*10;
+                break;
+            }
+        }
+
+        UIManager.UpdatePiggyScreen(goldNum, winsAwayFromReward, 2);
+
+        UIManager.OpenScreen("PiggyBankLost_Canvas");
     }
 
 
@@ -1165,7 +1206,7 @@ public class DataManager : MonoBehaviour
                     //updates rank for the above score value
                     ScoreClass Object = new ScoreClass();
                     Object.score = score;
-                    Object.diceleID = diceleID;
+                    Object.diceleId = diceleID;
                     await ApiHelper.SendJSONData(postURL+userDailyDataURL, Object);
                     //_____________________________________________________________________________________________
                 }
@@ -1204,6 +1245,7 @@ public class DataManager : MonoBehaviour
                 }
             }
 
+            
 
             if(streakWon)
             {
@@ -1214,7 +1256,7 @@ public class DataManager : MonoBehaviour
             }
             else
             {
-                UIManager.OpenScreen("PiggyBankCongratulations_Canvas");
+                if(ClassicLvlIndex!=1) UIManager.OpenScreen("PiggyBankCongratulations_Canvas");
                 UIManager.UpdatePiggyScreen(goldNum, winsAwayFromReward, 0);
             }
 

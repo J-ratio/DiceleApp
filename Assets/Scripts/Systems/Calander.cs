@@ -14,6 +14,8 @@ public class Calander : MonoBehaviour
     private List<int> MonthlyStarsList = new List<int>();
 
     [SerializeField]
+    private TextMeshProUGUI TotalStarsCount;
+    [SerializeField]
     private TextMeshProUGUI goldCheckPointTxt;
     [SerializeField]
     private TextMeshProUGUI ButtonMonthTxt;
@@ -23,6 +25,9 @@ public class Calander : MonoBehaviour
     private Button DailyDicele;
     [SerializeField]
     private Slider TrophySlider;
+
+    [SerializeField]
+    private GameObject backButton;
 
     /// <summary>
     /// Cell or slot in the calendar. All the information each day should now about itself
@@ -145,6 +150,10 @@ public class Calander : MonoBehaviour
 
     void UpdateCalendar(int year, int month)
     {
+
+        if(StartDate.Month == month) backButton.SetActive(false);
+        else backButton.SetActive(true);
+
         DateTime temp = new DateTime(year, month, 1);
         currDate = temp;
         MonthAndYear.text = temp.ToString("MMMM") + " " + temp.Year.ToString();
@@ -152,6 +161,7 @@ public class Calander : MonoBehaviour
         int endDay = GetTotalNumberOfDays(year, month);
 
         goldCheckPointTxt.text = ((endDay - 1)*5).ToString();
+        TotalStarsCount.text = MonthlyStarsList[((currDate.Year - StartDate.Year) * 12 + currDate.Month - StartDate.Month)].ToString();
         TrophySlider.value = GetSliderValue(((currDate.Year - StartDate.Year) * 12 + currDate.Month - StartDate.Month), (endDay - 1)*5);
 
         ///Create the days
@@ -228,7 +238,9 @@ public class Calander : MonoBehaviour
         ///This just checks if today is on our calendar.
         if(DateTime.Now.Year == year && DateTime.Now.Month == month)
         {
+            if(StateList[StateList.Count - 1] == 1){
             days[(DateTime.Now.Day - 1) + startDay].UpdateState(3,0);
+            }
         }
 
     }
