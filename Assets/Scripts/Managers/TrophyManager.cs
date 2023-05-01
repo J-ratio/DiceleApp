@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 using TMPro;
 
@@ -12,6 +13,9 @@ public class TrophyManager : MonoBehaviour
     private List<int> MonthlyStarsList = new List<int>();
     [SerializeField] DataManager DataManager;
     Transform[] TrophyList = new Transform[12];
+
+    [SerializeField] Sprite[] ActiveTrophies;
+    [SerializeField] Sprite[] DisabledTrophies;
 
 
 
@@ -25,9 +29,17 @@ public class TrophyManager : MonoBehaviour
             TrophyList[i] = t.transform;
             TrophyList[i].GetChild(2).transform.GetComponent<TextMeshProUGUI>().text = GetMonthText(i);
             TrophyList[i].GetChild(5).transform.GetChild(3).transform.GetComponent<TextMeshProUGUI>().text = GetMonthStars(i).ToString();
-            TrophyList[i].GetChild(3).gameObject.SetActive(false);
-            TrophyList[i].GetChild(4).gameObject.SetActive(false);
-            TrophyList[i].GetChild(5).gameObject.SetActive(false);
+            if(i < StartDate.Month - 1 || i > DateTime.Now.Month - 1) {
+                TrophyList[i].GetChild(3).gameObject.SetActive(false);
+                TrophyList[i].GetChild(4).gameObject.SetActive(false);
+                TrophyList[i].GetChild(5).gameObject.SetActive(false);
+            }
+            else {
+                TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = DisabledTrophies[i*3];
+                TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().sprite = DisabledTrophies[i*3+1];
+                TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().sprite = DisabledTrophies[i*3+2];
+            }
+            
         }
     }
 
@@ -106,17 +118,17 @@ public class TrophyManager : MonoBehaviour
         {
             if(i < month + MonthlyStarsList.Count && i >= month)
             {
-                if(MonthlyStarsList[i - month] > 15 && MonthlyStarsList[i - month] < 60 )
+                if(MonthlyStarsList[i - month] >= 15 && MonthlyStarsList[i - month] < 60 )
                 {
-                    TrophyList[i].GetChild(3).gameObject.SetActive(true);
+                    TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3];
                 }
-                else if(MonthlyStarsList[i - month] < GetMonthStars(i) && MonthlyStarsList[i - month] > 60)
+                else if(MonthlyStarsList[i - month] < GetMonthStars(i) && MonthlyStarsList[i - month] >= 60)
                 {
-                    TrophyList[i].GetChild(4).gameObject.SetActive(true);
+                    TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3+1];
                 }
-                else if(MonthlyStarsList[i - month] > GetMonthStars(i))
+                else if(MonthlyStarsList[i - month] >= GetMonthStars(i))
                 {
-                    TrophyList[i].GetChild(5).gameObject.SetActive(true);
+                    TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3];
                 }
             }
         }

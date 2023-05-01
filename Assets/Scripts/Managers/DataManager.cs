@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 public class DataManager : MonoBehaviour
 {
+    
 
     private List<int> solList = new List<int>();
     private List<int> spawnList = new List<int>();
@@ -19,6 +20,8 @@ public class DataManager : MonoBehaviour
     private bool isDaily = true;
     private bool isNewDay = false;
     private bool isNextDay = false;
+
+    [SerializeField] GameObject loadingScreen;
 
     DateTime StartDate = new DateTime(2023,1,10);
 
@@ -88,6 +91,7 @@ public class DataManager : MonoBehaviour
         userWeeklyLeaderboardsURL += SystemInfo.deviceUniqueIdentifier;
         userAllTimeLeaderboardsURL += SystemInfo.deviceUniqueIdentifier;
         userDailyDataURL += SystemInfo.deviceUniqueIdentifier + "/daily";
+
     }
 
     [Serializable]
@@ -172,6 +176,7 @@ public class DataManager : MonoBehaviour
     public List<userStats> WeeklyRankList = new List<userStats>(10);
     public List<userStats> AllTimeRankList = new List<userStats>(10);
     public userStats PlayerDailyData;
+    public userStats PlayerYesterdayData;
     public userStats PlayerWeeklyData;
     public userStats PlayerAllTimeData;
 
@@ -201,6 +206,7 @@ public class DataManager : MonoBehaviour
         }
 
         PlayerDailyData = UserDailyData.info.currentDay.userStats;
+        PlayerYesterdayData = UserDailyData.info.yesterday.userStats;
         
     }
 
@@ -566,10 +572,7 @@ public class DataManager : MonoBehaviour
         UpdateStats();
         slider.SetSliderToFull();
 
-
-        Debug.Log("passed");
-
-        
+        transform.GetComponent<GoogleAdMobController>().RequestBannerAd();
 
         if(isFirstTime) StartClassicLvl();
 
@@ -788,7 +791,7 @@ public class DataManager : MonoBehaviour
         int daysLeft = (int)timeLeft.TotalDays;
 
         MonthlyStarsList.Add(0);
-        for(int i = 0; i < daysLeft; i++)
+        for(int i = 0; i < daysLeft+1; i++)
         {
             MonthlyStarsList[0] += StarsList[StarsList.Count - 1];
             StarsList.RemoveAt(StarsList.Count - 1);
@@ -961,7 +964,7 @@ public class DataManager : MonoBehaviour
         //Show Results
         if (gameIndex == DayNum && isDaily)
         {
-            slider.StartSlider();
+            loadingScreen.SetActive(true);
             //_____________________________________________________________________________________________
             //fetches the rank for the above score value
 
@@ -1019,16 +1022,20 @@ public class DataManager : MonoBehaviour
                 //______________________________
             }
 
-            slider.SetSliderToFull();
+            loadingScreen.SetActive(false);
         }
         else
         {
             UIManager.UpdateResultScreen(score, rank, xp, coins, false);
         }
 
-        if (isDaily || (ClassicLvlIndex != 0 && ClassicLvlIndex != 1))
+        if (isDaily)
         {
             UIManager.OpenScreen("Level_Complete_Canvas");
+        }
+        else if(ClassicLvlIndex != 0 && ClassicLvlIndex != 1)
+        {
+            UIManager.OpenScreen("Level_Complete_Classic_Canvas");
         }
         else
         {
@@ -1134,6 +1141,22 @@ public class DataManager : MonoBehaviour
     }
 
 
+    public async void AwardGold()
+    {
+        PlayerCoins += 30;
+        UIManager.UpdatePlayerStats(PlayerXp, PlayerCoins);
+        coinAnim.AddCoins(0);
+
+        //-----------------------------------------------------------------------
+            //Update Player Coins
+            CoinsClass Object = new CoinsClass();
+            Object.playerCoins = PlayerCoins;
+            await ApiHelper.SendJSONData(postURL+userProfileURL+updateStatsURL, Object);
+        //-----------------------------------------------------------------------
+
+    }
+
+
     public void RetryLvl()
     {
         if (isDaily)
@@ -1147,20 +1170,27 @@ public class DataManager : MonoBehaviour
     }
 
 
-    public async void Collect()
+    public async void Collect(bool doubleReward)
     {
 
         int score = queuedWinCase[3];
         int swapped = queuedWinCase[2];
 
+        if(doubleReward) {
+            PlayerCoins = PlayerCoins + 2*queuedWinCase[0];
+            PlayerXp = PlayerXp + 2*queuedWinCase[1];
+        }
+        else {
+            PlayerCoins = PlayerCoins + queuedWinCase[0];
+            PlayerXp = PlayerXp + queuedWinCase[1];
+        }
 
-        PlayerCoins = PlayerCoins + queuedWinCase[0];
-        PlayerXp = PlayerXp + queuedWinCase[1];
         UIManager.UpdatePlayerStats(PlayerXp, PlayerCoins);
 
 
 
         UIManager.CloseScreen("Level_Complete_Canvas");
+        UIManager.CloseScreen("Level_Complete_Classic_Canvas");
         UIManager.CloseScreen("Level_Failed_Canvas");
 
 
@@ -1219,7 +1249,6 @@ public class DataManager : MonoBehaviour
             ClassicLvlIndex++;
             StartClassicLvl();
             UIManager.UpdateClassicLevel(ClassicLvlIndex + 1);
-            coinAnim.AddCoins(1);
 
             ClassicStreak++;
             if(BestClassicStreak < ClassicStreak) BestClassicStreak = ClassicStreak;
@@ -1245,22 +1274,23 @@ public class DataManager : MonoBehaviour
                 }
             }
 
-            
+            UIManager.UpdatePlayerStats(PlayerXp,PlayerCoins);
+
 
             if(streakWon)
             {
                 UIManager.OpenScreen("PiggyBankUnlocked_Canvas");
                 UIManager.UpdatePiggyScreen(goldNum, winsAwayFromReward, 1);
-                
                 PlayerCoins += goldNum;
             }
             else
             {
-                if(ClassicLvlIndex!=1) UIManager.OpenScreen("PiggyBankCongratulations_Canvas");
+                if(ClassicLvlIndex!=1 && ClassicLvlIndex != 2) {UIManager.OpenScreen("PiggyBankCongratulations_Canvas"); coinAnim.AddCoins(2);}
                 UIManager.UpdatePiggyScreen(goldNum, winsAwayFromReward, 0);
             }
 
-            UIManager.UpdatePlayerStats(PlayerXp,PlayerCoins);
+            
+            
 
             //_____________________________________________________________________________________________
             //updates the currentClassicLvl variable for the given playerID
@@ -1279,10 +1309,6 @@ public class DataManager : MonoBehaviour
 
         }
 
-
-
-
-
         //-----------------------------------------------------------------------
         //Update Player Coins and Xp
 
@@ -1294,6 +1320,14 @@ public class DataManager : MonoBehaviour
         Object1.playerXp = PlayerXp;
         await ApiHelper.SendJSONData(postURL+userProfileURL+updateStatsURL, Object1);
         //-----------------------------------------------------------------------
+    }
+
+
+    public void playCoinAnim()
+    {
+        coinAnim.AddCoins(1);
+        UIManager.UpdatePlayerStats(PlayerXp,PlayerCoins);
+
     }
 
 

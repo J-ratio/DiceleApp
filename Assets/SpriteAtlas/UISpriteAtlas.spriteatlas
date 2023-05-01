@@ -283,6 +283,24 @@ SpriteAtlas:
   - {fileID: 21300000, guid: e0c620cebc721c54ebcf8b92c1701f80, type: 3}
   - {fileID: 21300000, guid: 7b51f8ce17b4b9e49979001192c1fe75, type: 3}
   - {fileID: 21300000, guid: 023dcfce13d44c64687c7d2007682d14, type: 3}
+  - {fileID: 1335825007, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -1403939492, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -695732757, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: 1120595102, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -1805709026, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -961383810, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -763130562, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -458600343, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: 336684289, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -711817485, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: 797906938, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -1441725689, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -443809957, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -1883072128, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: 882375281, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: -890266775, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: 1030193769, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
+  - {fileID: 2097709318, guid: 9efc67fef83d2d54cac1d6594868c510, type: 3}
   - {fileID: 21300000, guid: e0b77ffe4486844438fa67102d346010, type: 3}
   - {fileID: 21300000, guid: 8218771fbd9598a44a67296c013182ca, type: 3}
   - {fileID: 21300000, guid: 4d566d2fd2357894986a55fdb7ceb30c, type: 3}
@@ -533,6 +551,24 @@ SpriteAtlas:
   - notification_dot
   - LevelIcon_Completed
   - ProfileIcon_3
+  - ezgif.com-gif-maker_11
+  - ezgif.com-gif-maker_10
+  - ezgif.com-gif-maker_13
+  - ezgif.com-gif-maker_12
+  - ezgif.com-gif-maker_15
+  - ezgif.com-gif-maker_14
+  - ezgif.com-gif-maker_17
+  - ezgif.com-gif-maker_16
+  - ezgif.com-gif-maker_8
+  - ezgif.com-gif-maker_9
+  - ezgif.com-gif-maker_2
+  - ezgif.com-gif-maker_3
+  - ezgif.com-gif-maker_0
+  - ezgif.com-gif-maker_1
+  - ezgif.com-gif-maker_6
+  - ezgif.com-gif-maker_7
+  - ezgif.com-gif-maker_4
+  - ezgif.com-gif-maker_5
   - speaker_icon
   - TickIcon
   - Price_back_bg

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class WaitSlider : MonoBehaviour
 {
     public Slider slider;
+    public GameObject logo;
 
 
     // Start is called before the first frame update
@@ -30,6 +31,10 @@ public class WaitSlider : MonoBehaviour
 
     IEnumerator Slide()
     {
+        yield return new WaitForSeconds(1.0f);
+        
+        logo.SetActive(false);
+
         while(slider.value < 0.4f)
         {
             slider.value += 0.03f;

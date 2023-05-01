@@ -4049,11 +4049,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1358a0c778a6f647b309d6e94b5eb02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TotalStarsCount: {fileID: 0}
   goldCheckPointTxt: {fileID: 1900312163406860631}
   ButtonMonthTxt: {fileID: 1900312164220853119}
   ButtonDayTxt: {fileID: 1900312163315871152}
   DailyDicele: {fileID: 1900312163316651801}
   TrophySlider: {fileID: 0}
+  backButton: {fileID: 0}
   weeks:
   - {fileID: 3984080714561817959}
   - {fileID: 3984080714355310082}
@@ -16813,7 +16815,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 707042181294711541}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -16947,8 +16949,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4614006892756500139}
-  - {fileID: 6393150320130547128}
   - {fileID: 670421501433459666}
+  - {fileID: 6393150320130547128}
   m_Father: {fileID: 1900312164663850078}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -17249,7 +17251,7 @@ RectTransform:
   m_Children:
   - {fileID: 8299096013414880590}
   m_Father: {fileID: 707042181294711541}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}

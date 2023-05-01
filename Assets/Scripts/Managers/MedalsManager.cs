@@ -27,8 +27,7 @@ public class MedalsManager : MonoBehaviour
 
     public void SetDailyRank()
     {
-        int rank = DataManager.PlayerDailyData.userRank;
-
+        int rank = DataManager.PlayerYesterdayData.userRank;
 
         int temp;
 

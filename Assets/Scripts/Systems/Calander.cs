@@ -28,6 +28,8 @@ public class Calander : MonoBehaviour
 
     [SerializeField]
     private GameObject backButton;
+    [SerializeField]
+    private GameObject nextButton;
 
     /// <summary>
     /// Cell or slot in the calendar. All the information each day should now about itself
@@ -153,6 +155,9 @@ public class Calander : MonoBehaviour
 
         if(StartDate.Month == month) backButton.SetActive(false);
         else backButton.SetActive(true);
+
+        if(DateTime.Now.Month == month) nextButton.SetActive(false);
+        else nextButton.SetActive(true);
 
         DateTime temp = new DateTime(year, month, 1);
         currDate = temp;

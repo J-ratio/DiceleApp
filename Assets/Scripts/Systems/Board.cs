@@ -580,7 +580,7 @@ public class Board : MonoBehaviour
 
             void SwapDone()
             {
-                if (matched > 0) //== Num * Num - emptySlots.Count)
+                if (matched == Num * Num - emptySlots.Count)
                 {
                     UndoButton.GetComponent<Button>().enabled = false;
                     HintButton.GetComponent<Button>().enabled = false;
@@ -885,42 +885,53 @@ public class Board : MonoBehaviour
 
     void playGameWinSound()
     {
-        gameWinSound.Play();
-        Invoke("playSecondtime", 1.0f*Num/4);
+        if(UIManager.SoundTogggle)
+        {
+            gameWinSound.Play();
+            Invoke("playSecondtime", 1.0f*Num/4);
+        }
+        
     }
 
     void playSecondtime()
     {
+        if(UIManager.SoundTogggle)
         gameWinSound.Play();
     }
 
     void playLevelLoseSound()
     {
+        if(UIManager.SoundTogggle)
         loseSound.Play();
     }
 
     void playLevelWinSound()
     {
+        if(UIManager.SoundTogggle)
         winSound.Play();
     }
 
     void playMatchSound()
     {
+        if(UIManager.SoundTogggle)
         matchSound.Play();
     }
 
     void playSwapSound()
     {
+        if(UIManager.SoundTogggle)
         swapSound.Play();
     }
 
     void playUndoSound()
     {
+        if(UIManager.SoundTogggle)
         undoSound.Play();
     }
 
     void playGreenDiceSound()
     {
+        if(UIManager.SoundTogggle)
         greenDiceSound.Play();
     }
 

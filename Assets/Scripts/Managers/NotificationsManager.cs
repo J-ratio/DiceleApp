@@ -57,12 +57,13 @@ public class NotificationsManager : MonoBehaviour
 
         two_day_notif.ShowTimestamp = true;
         two_day_notif.RepeatInterval = new TimeSpan(48,0,0);
-        two_day_notif.FireTime = System.DateTime.Now.AddHours(2);
+        var date = DateTime.Now;
+        var day = new DateTime(date.Year, date.Month, date.Day);
+        two_day_notif.FireTime = day.AddHours(18);
 
         var identifier0 = AndroidNotificationCenter.SendNotification(two_day_notif, "example_channel");
 
         if(AndroidNotificationCenter.CheckScheduledNotificationStatus (identifier0) == NotificationStatus.Scheduled) {
-            AndroidNotificationCenter.CancelAllNotifications();
 
             r = UnityEngine.Random.Range(0, 7);
 
@@ -98,14 +99,13 @@ public class NotificationsManager : MonoBehaviour
                 break;
             }
 
-            AndroidNotificationCenter.SendNotification(two_day_notif,  "example_channel");
+            AndroidNotificationCenter.UpdateScheduledNotification(identifier0, two_day_notif, "example_channel");
         }
 
 
         AndroidNotification trophy_notif = new AndroidNotification();
 
         trophy_notif.ShowTimestamp = true;
-        var date = DateTime.Now;
         var firstDay = new DateTime(date.Year, date.Month, 1);
         trophy_notif.FireTime = firstDay.AddMonths(1);
         trophy_notif.Title= "New Trophies Unlocked 🏆🏆🏆";

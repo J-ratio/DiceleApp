@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject[] screens;
 
     //List of UI elements stored in ResultScreenUI
-    //0 => ScoreText Center, 1 => ScoreText Left, 2 => RankText, 3 => XPText, 4 => CoinsText
+    //0 => ScoreText Center, 1 => ScoreText Left, 2 => RankText, 3 => XPText, 4 => CoinsText, 5 => Classic ScoreText, 6 => Classic Xp, 7 => Classic Coin
     [SerializeField] private TextMeshProUGUI[] ResultScreenUI;
 
     //0 => ScoreHead Center, 1 => ScoreHead Left, 2 => RankHead
@@ -48,7 +48,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] public TMP_InputField UserNameInputText;
 
     [SerializeField] GameObject[] Avatars;
-    [SerializeField] Image Avatar;
+    [SerializeField] Image[] Avatar;
+
+
+    public static bool SoundTogggle = true;
 
     void OnEnable()
     {
@@ -91,6 +94,13 @@ public class UIManager : MonoBehaviour
     }
 
 
+    public void ChangeSoundToggle()
+    {
+        if(SoundTogggle) SoundTogggle = false;
+        else SoundTogggle = true;
+    }
+
+
     public void OpenScreen(string name)
     {
         foreach (GameObject screen in screens)
@@ -127,6 +137,9 @@ public class UIManager : MonoBehaviour
         ResultScreenUI[2].text = rank.ToString();
         ResultScreenUI[3].text = Xp.ToString();
         ResultScreenUI[4].text = Coins.ToString();
+        ResultScreenUI[5].text = score.ToString();
+        ResultScreenUI[6].text = Xp.ToString();
+        ResultScreenUI[7].text = Coins.ToString();
 
 
         if (showRank)
@@ -134,6 +147,7 @@ public class UIManager : MonoBehaviour
             ResultScreenScoreUI[0].SetActive(false);
             ResultScreenScoreUI[1].SetActive(true);
             ResultScreenScoreUI[2].SetActive(true);
+
         }
         else
         {
@@ -150,10 +164,38 @@ public class UIManager : MonoBehaviour
     {
         MainScreenUI[0].text = xp.ToString();
         MainScreenUI[5].text = xp.ToString();
-        MainScreenUI[1].text = coins.ToString();
+        // MainScreenUI[1].text = coins.ToString();
         CalanderScreenUI[0].text = xp.ToString();
-        CalanderScreenUI[1].text = coins.ToString();
-        GameScreenUI[0].text = coins.ToString();
+        // CalanderScreenUI[1].text = coins.ToString();
+        // GameScreenUI[0].text = coins.ToString();
+
+
+        StartCoroutine(CoinTextAnim(coins));
+    }
+
+
+    IEnumerator CoinTextAnim(int coins) {
+        
+        float waitTime = 3.0f/coins;
+        int initialCoins = int.Parse(MainScreenUI[1].text);
+        int temp = 0;
+
+        Debug.Log(initialCoins);
+    
+
+        while( initialCoins + temp != coins)
+        {
+            if(initialCoins > coins) temp--;
+            else temp++;
+            
+            MainScreenUI[1].text = (initialCoins + temp).ToString();
+            CalanderScreenUI[1].text = (initialCoins + temp).ToString();
+            GameScreenUI[0].text = (initialCoins + temp).ToString();
+
+            yield return new WaitForSeconds(waitTime);
+        }
+
+        yield break;
     }
 
 
@@ -194,7 +236,9 @@ public class UIManager : MonoBehaviour
 
     public void UpdateAvatar(int num)
     {
-        Avatar.sprite = Avatars[num].GetComponent<Image>().sprite;
+        Avatar[0].sprite = Avatars[num].GetComponent<Image>().sprite;
+        Avatar[1].sprite = Avatars[num].GetComponent<Image>().sprite;
+
 
         for(int i = 0; i < Avatars.Count(); i++)
         {
@@ -212,7 +256,8 @@ public class UIManager : MonoBehaviour
             if(winsAway != 1) PiggyScreenUI[0].text = winsAway.ToString() + " Wins to unlock,win and \ncontinue filling";
             else PiggyScreenUI[0].text = winsAway.ToString() + " Win to unlock,win and \ncontinue filling";
             
-            PiggyScreenUI[1].text = Gold.ToString();
+            //PiggyScreenUI[1].text = Gold.ToString();
+            StartCoroutine(PiggyCoinTextAnim(Gold));
 
         }
         else if(action == 1)
@@ -227,6 +272,25 @@ public class UIManager : MonoBehaviour
 
             PiggyScreenUI[4].text = Gold.ToString();
         }
+    }
+
+
+    IEnumerator PiggyCoinTextAnim(int finalCoins) {
+        
+        float waitTime = 0.2f;
+        int initialCoins = finalCoins - 10;
+        int temp = 0;
+
+        while( initialCoins + temp != finalCoins)
+        {
+            temp++;
+            
+            PiggyScreenUI[1].text = (initialCoins + temp).ToString();
+
+            yield return new WaitForSeconds(waitTime);
+        }
+
+        yield break;
     }
 
 

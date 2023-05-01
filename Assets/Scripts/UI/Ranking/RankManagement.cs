@@ -29,6 +29,9 @@ public class RankManagement : MonoBehaviour
     [SerializeField]  GameObject PlayerRank;
     [SerializeField] DataManager DataManager;
 
+
+    [SerializeField] TextMeshProUGUI[] Headers;
+
     
 
     // Start is called before the first frame update
@@ -52,6 +55,8 @@ public class RankManagement : MonoBehaviour
     {
         if(x == 0)
         {
+            Headers[0].text = "YESTERDAY";
+            Headers[1].text = "TODAY";
             ShowDailyBoard();
             DailyBtn.GetChild(0).gameObject.SetActive(false);
             DailyBtn.GetChild(1).gameObject.SetActive(true);
@@ -62,6 +67,8 @@ public class RankManagement : MonoBehaviour
         }
         else if(x == 1)
         {
+            Headers[0].text = "Top Scores";
+            Headers[1].text = "WEEKLY";
             ShowWeeklyBoard();
             DailyBtn.GetChild(0).gameObject.SetActive(true);
             DailyBtn.GetChild(1).gameObject.SetActive(false);
@@ -72,6 +79,8 @@ public class RankManagement : MonoBehaviour
         }
         else
         {
+            Headers[0].text = "Top Scores";
+            Headers[1].text = "ALL-TIME";
             ShowAllTimeBoard();
             DailyBtn.GetChild(0).gameObject.SetActive(true);
             DailyBtn.GetChild(1).gameObject.SetActive(false);

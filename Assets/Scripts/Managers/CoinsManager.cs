@@ -11,6 +11,7 @@ public class CoinsManager : MonoBehaviour
 	[SerializeField] GameObject animatedCoinPrefab;
 	[SerializeField] Transform[] target;
 	[SerializeField] Vector3 collectedCoinPosition;
+	[SerializeField] Transform StreakCoin;
 
 	[Space]
 	[Header ("Available coins : (coins to pool)")]
@@ -56,8 +57,17 @@ public class CoinsManager : MonoBehaviour
 				GameObject coin = coinsQueue.Dequeue ();
 				coin.SetActive (true);
 
-				//move coin to the collected coin pos
-				coin.transform.position = collectedCoinPosition + new Vector3 (Random.Range (-spread, spread), 0f, 0f);
+				if(temp == 2)
+				{
+					//move coin to the collected coin pos
+					coin.transform.position = StreakCoin.position + new Vector3 (Random.Range (-spread, spread), 0f, 0f);
+				}
+				else
+				{
+					//move coin to the collected coin pos
+					coin.transform.position = collectedCoinPosition + new Vector3 (Random.Range (-spread, spread), 0f, 0f);
+				}
+
 
 				//animate coin to target position
 				float duration = Random.Range (minAnimDuration, maxAnimDuration);
