@@ -50,6 +50,7 @@ public class DataManager : MonoBehaviour
     public int BestClassicStreak;
     int[] piggyArr = {3,8,15,25,40,60,90,150,250};
     int[] queuedWinCase = new int[4];
+    int dailyRank;
 
 
 
@@ -63,6 +64,8 @@ public class DataManager : MonoBehaviour
     private int[] tempExampleClassicSpawnArr0 = { 5, 1, 0, 3 };
     private int[] tempExampleClassicSolArr1 = { 0, 1, 4, 1, -1, 0, 5, 0, 2 };
     private int[] tempExampleClassicSpawnArr1 = { 2, 1, 0, 1, -1, 0, 5, 0, 4 };
+
+    public int[] medalTally = {0,0,0,0,0};
 
     [SerializeField] private GamePlayTutorial playTutorial;//Added by charan
 
@@ -79,6 +82,7 @@ public class DataManager : MonoBehaviour
     string userDailyLeaderboardsURL = "/leaderboard/daily/";
     string userWeeklyLeaderboardsURL = "/leaderboard/weekly/";
     string userAllTimeLeaderboardsURL = "/leaderboard/alltime/";
+    string dailyMedalsTallyURL = "/user/medals/";
 
 
     
@@ -90,6 +94,7 @@ public class DataManager : MonoBehaviour
         userDailyLeaderboardsURL += SystemInfo.deviceUniqueIdentifier;
         userWeeklyLeaderboardsURL += SystemInfo.deviceUniqueIdentifier;
         userAllTimeLeaderboardsURL += SystemInfo.deviceUniqueIdentifier;
+        dailyMedalsTallyURL += SystemInfo.deviceUniqueIdentifier;
         userDailyDataURL += SystemInfo.deviceUniqueIdentifier + "/daily";
 
     }
@@ -105,6 +110,38 @@ public class DataManager : MonoBehaviour
     {
         public int score;
         public string diceleId;
+    }
+
+
+    [Serializable]
+    class GetDailyMedalResponse{
+        public DailyMedalInfo info;
+    }
+
+    [Serializable]
+    class DailyMedalInfo{
+        public int FIRST_RANK;
+        public int SECOND_RANK;
+        public int THIRD_RANK;
+        public int TOP1000_RANK;
+        public int TOP10_RANK;
+    }
+
+
+    public async void GetDailyMedalsCount()
+    {
+        var temp = await ApiHelper.RequestJSONData(getURL+dailyMedalsTallyURL);
+        GetDailyMedalResponse MedalData = JsonUtility.FromJson<GetDailyMedalResponse>(temp.response);
+        Debug.Log(temp.response);
+
+        if(MedalData?.info?.FIRST_RANK != null)
+        {
+            medalTally[0] = MedalData.info.FIRST_RANK;
+            medalTally[1] = MedalData.info.SECOND_RANK;
+            medalTally[2] = MedalData.info.THIRD_RANK;
+            medalTally[3] = MedalData.info.TOP10_RANK;
+            medalTally[4] = MedalData.info.TOP1000_RANK;
+        }
     }
 
 
@@ -278,6 +315,7 @@ public class DataManager : MonoBehaviour
         public int ClassicStreak;
         public int BestClassicStreak;
         public int Avatar;
+        public bool isAdDisabled;
     }
 
     [Serializable]
@@ -335,6 +373,12 @@ public class DataManager : MonoBehaviour
         public string userName;
     }
 
+    [Serializable]
+    class AdsClass
+    {
+        public bool isAdDisabled;
+    }
+
 
     [Serializable]
     class AvatarClass
@@ -374,6 +418,7 @@ public class DataManager : MonoBehaviour
         public int ClassicStreak;
         public int BestClassicStreak;
         public int Avatar;
+        public bool isAdDisabled;
     }
 
 
@@ -426,6 +471,11 @@ public class DataManager : MonoBehaviour
     async void Start()
     {  
 
+        // Log an event with a float parameter
+        Firebase.Analytics.FirebaseAnalytics
+        .LogEvent("App Open");
+
+
         
         bool isFirstTime = false;
 
@@ -436,8 +486,6 @@ public class DataManager : MonoBehaviour
         ScoreList = new List<int>(DayNum + 1);
         MovesList = new List<int>(DayNum + 1);
         TrophyList = new List<int>(MonthNum);
-
-        Debug.Log("Started");
         
         //login user
         IdClass Object = new IdClass();
@@ -473,6 +521,7 @@ public class DataManager : MonoBehaviour
             tempObject.Avatar = 0;
             tempObject.ClassicStreak = 0;
             tempObject.BestClassicStreak = 0;
+            tempObject.isAdDisabled = false;
 
             temp0 = await ApiHelper.SendJSONData(postURL + userProfileURL + updateStatsURL, tempObject);
             UserData = JsonUtility.FromJson<GetResponse>(temp0.response);
@@ -527,7 +576,7 @@ public class DataManager : MonoBehaviour
                     //ScoreList[i] = 0;
                     //MovesList[i] = -2;
                     ScoreList.Add(0);
-                    MovesList.Add(0);
+                    MovesList.Add(-2);
                 }
             }   
             
@@ -536,10 +585,7 @@ public class DataManager : MonoBehaviour
             Object0.movesList = MovesList.ToArray();
 
             temp0 = await ApiHelper.SendJSONData(postURL + userProfileURL + updateStatsURL, Object0);
-            UserData = JsonUtility.FromJson<GetResponse>(temp0.response);
-
-            Debug.Log("passed init2");
-            
+            UserData = JsonUtility.FromJson<GetResponse>(temp0.response);            
         }
 
 
@@ -569,13 +615,38 @@ public class DataManager : MonoBehaviour
         StoreWeeklyBoard();
         StoreAllTimeBoard();
 
+
+        GetDailyMedalsCount();
+
         UpdateStats();
         slider.SetSliderToFull();
 
-        transform.GetComponent<GoogleAdMobController>().RequestBannerAd();
+        if(UserData.info.isAdDisabled)
+        {
+            transform.GetComponent<GoogleAdMobController>().RequestBannerAd();
+        }
 
         if(isFirstTime) StartClassicLvl();
 
+    }
+
+
+    public async void RemoveAds()
+    {
+        AdsClass Object = new AdsClass();
+        Object.isAdDisabled = true;
+        await ApiHelper.SendJSONData(postURL+userProfileURL+updateStatsURL, Object);
+    }
+
+
+    public async void AddCoins(int coins)
+    {
+        PlayerCoins += coins;
+        UIManager.UpdatePlayerStats(PlayerXp, PlayerCoins);
+
+        CoinsClass Object = new CoinsClass();
+        Object.playerCoins = PlayerCoins;
+        await ApiHelper.SendJSONData(postURL+userProfileURL+updateStatsURL, Object);
     }
 
 
@@ -649,6 +720,32 @@ public class DataManager : MonoBehaviour
     }
 
 
+    public void ShareStats()
+    {
+        int stars = 0;
+
+        for(int i = 0; i < MovesList.Count; i ++)
+        {
+            if(MovesList[i] >= 0 )
+            {
+                stars +=  (21 - MovesList[i] > 5 ? 5 : 21 - MovesList[i]);
+            }
+        }
+
+        string msg = "Check out my Dicele Stats! \n 👍: " + MovesList.Count(x => x >= -1).ToString() + " wins \n ⭐: " + stars.ToString() + " stars collected \n 🏆: " + BestRank.ToString() + " best rank \n#DiceleApp";
+
+        shareMessage = msg;
+        ShareText();
+
+    }
+
+
+    public void ShareResults()
+    {
+        shareMessage = "🏆 I am currently at rank " + dailyRank.ToString() +  " world wide on Dicele Daily. \n#DiceleApp";
+        ShareText();
+    }
+
 
     /// <summary>
     /// This function is called when user clicks on the daily dicele button.
@@ -677,6 +774,11 @@ public class DataManager : MonoBehaviour
 
     void StartLvl(int levelNum)
     {
+        // Log an event with a float parameter
+        Firebase.Analytics.FirebaseAnalytics
+        .LogEvent("Daily Level", "Start" ,levelNum);
+
+
         playTutorial.isClassic = false;//Added by charan
         isDaily = true;
         gameIndex = levelNum;
@@ -707,6 +809,11 @@ public class DataManager : MonoBehaviour
 
     public void StartClassicLvl()
     {
+        // Log an event with a float parameter
+        Firebase.Analytics.FirebaseAnalytics
+        .LogEvent("Classic Level", "Start" , ClassicLvlIndex);
+
+
         playTutorial.isClassic = true;//Added by charan
         isDaily = false;
         currentUndoNum = 0;
@@ -829,6 +936,11 @@ public class DataManager : MonoBehaviour
 
     public async void Undo()
     {
+
+        // Log an event with a float parameter
+        Firebase.Analytics.FirebaseAnalytics
+        .LogEvent("Undo");
+        
         int[] CoinOptions = { 50, 100, 300 };
         int requiredCoins = CoinOptions[currentUndoNum > 2 ? 2 : currentUndoNum];
 
@@ -863,6 +975,12 @@ public class DataManager : MonoBehaviour
 
     public async void Hint()
     {
+
+        // Log an event with a float parameter
+        Firebase.Analytics.FirebaseAnalytics
+        .LogEvent("Hint");
+
+
         int[] CoinOptions = { 100, 200, 500, 1000 };
         int requiredCoins = CoinOptions[currentHintNum > 3 ? 3 : currentHintNum];
 
@@ -898,6 +1016,11 @@ public class DataManager : MonoBehaviour
 
     public void StartCustomLevel()
     {
+        
+        // Log an event with a float parameter
+        Firebase.Analytics.FirebaseAnalytics
+        .LogEvent("Add 3 moves");
+        
         currentUndoNum = 0;
         currentHintNum = 0;
         //________________________________________________________________________________________________
@@ -945,12 +1068,20 @@ public class DataManager : MonoBehaviour
 
         if (isDaily)
         {
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent("Daily Level End", "win", gameIndex);
+
             coins = (xp - 10 > 30 ? (xp - 10) / 100 : 30);
             // Winning Bonus(10) + ScoreImprovementBonus
             xp = 10 + ((score - ScoreList[gameIndex]) > 0 ? (score - ScoreList[gameIndex]) : 0) / 100;
         }
         else
         {
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent("Classic Level End", "win", ClassicLvlIndex );
+
             coins = 10;
             xp = 10 + (score) / 100;
         }
@@ -992,6 +1123,7 @@ public class DataManager : MonoBehaviour
             //_____________________________________________________________________________________________
 
             rank = UserDailyData0.info.currentDay.userStats.userRank;
+            dailyRank = rank;
             UIManager.UpdateResultScreen(score, rank, xp, coins, true);
 
             if(rank > BestRank)
@@ -1065,6 +1197,11 @@ public class DataManager : MonoBehaviour
 
         if (isDaily)
         {
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent("Daily Level End" , "lose", gameIndex);
+
+            
             MovesList[gameIndex] = -1;            
             UpdateStats();
 
@@ -1100,6 +1237,11 @@ public class DataManager : MonoBehaviour
         }
         else
         {
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent("Classic Level End" , "lose", ClassicLvlIndex);
+
+
             UIManager.OpenScreen("Level_Failed_Canvas");
             UIManager.CloseScreen("GamePlay_Canvas");
         }
@@ -1108,24 +1250,41 @@ public class DataManager : MonoBehaviour
 
     public void ShowPiggyLostScreen()
     {
+        if(!isDaily)
+        {
 
-        int winsAwayFromReward = 0;
-        int goldNum = 0;
+            int winsAwayFromReward = 0;
+            int goldNum = 0;
 
-        for(int i = 0; i < piggyArr.Count(); i++)
-        {   
-            
-            if(ClassicStreak < piggyArr[i])
-            {
-                winsAwayFromReward = piggyArr[i] - ClassicStreak;
-                goldNum = ClassicStreak*10;
-                break;
+            for(int i = 0; i < piggyArr.Count(); i++)
+            {   
+                
+                if(ClassicStreak < piggyArr[i])
+                {
+                    winsAwayFromReward = piggyArr[i] - ClassicStreak;
+                    goldNum = ClassicStreak*10;
+                    break;
+                }
             }
+
+            if(goldNum != 0)
+            {
+                UIManager.UpdatePiggyScreen(goldNum, winsAwayFromReward, 2);
+                UIManager.OpenScreen("PiggyBankLost_Canvas");
+            }
+            else
+            {
+                UIManager.OpenScreen("Main_Menu_Canvas");
+                LoseStreak();
+            }
+
+        }
+        else
+        {
+            StartCalander();
         }
 
-        UIManager.UpdatePiggyScreen(goldNum, winsAwayFromReward, 2);
-
-        UIManager.OpenScreen("PiggyBankLost_Canvas");
+        
     }
 
 
@@ -1159,13 +1318,21 @@ public class DataManager : MonoBehaviour
 
     public void RetryLvl()
     {
+        
+
         if (isDaily)
         {
             StartLvl(gameIndex);
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent("Ads" ,"Level Retry", gameIndex);
         }
         else
         {
             StartClassicLvl();
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent( "Ads" ,"Level Retry", ClassicLvlIndex);
         }
     }
 
@@ -1179,6 +1346,10 @@ public class DataManager : MonoBehaviour
         if(doubleReward) {
             PlayerCoins = PlayerCoins + 2*queuedWinCase[0];
             PlayerXp = PlayerXp + 2*queuedWinCase[1];
+
+            // Log an event with a float parameter
+            Firebase.Analytics.FirebaseAnalytics
+            .LogEvent("Ads","2X Rewards",0);
         }
         else {
             PlayerCoins = PlayerCoins + queuedWinCase[0];
@@ -1206,7 +1377,7 @@ public class DataManager : MonoBehaviour
                 //_____________________________________________________________________________________________
             }
 
-            if (MovesList[gameIndex] < swapped)
+            if (MovesList[gameIndex] > swapped || MovesList[gameIndex]== 0)
             {
                 MovesList[gameIndex] = swapped;
                 //_____________________________________________________________________________________________
@@ -1331,6 +1502,28 @@ public class DataManager : MonoBehaviour
     }
 
 
+    public void productPurachse( int id )
+    {
+        if(id == 1) {
+        Firebase.Analytics.FirebaseAnalytics.LogEvent("Purchased", "NoAds",id);
+        }
+        else if(id == 2) {
+        Firebase.Analytics.FirebaseAnalytics.LogEvent("Purchased", "220Coins",id);
+        }
+        else if(id == 3) {
+        Firebase.Analytics.FirebaseAnalytics.LogEvent("Purchased", "660Coins",id);
+
+        }
+        else if(id == 4) {
+        Firebase.Analytics.FirebaseAnalytics.LogEvent("Purchased", "1210Coins",id);
+
+        }
+        else if(id == 5) {
+        Firebase.Analytics.FirebaseAnalytics.LogEvent("Purchased", "3300Coins",id);
+        }
+    }
+
+
     void OnDisable()
     {
         ActionEvents.StartLvl -= StartLvl;
@@ -1338,4 +1531,65 @@ public class DataManager : MonoBehaviour
         ActionEvents.TriggerGameLoseEvent -= GameLoseEvent;
 
     }
+
+
+    private bool isFocus = false;
+	private bool isProcessing = false;
+    public string shareMessage;
+
+
+
+	void OnApplicationFocus (bool focus) {
+		isFocus = focus;
+	}
+
+	public void ShareText () {
+
+		#if UNITY_ANDROID
+		if (!isProcessing) {
+			StartCoroutine (ShareTextInAnroid ());
+		}
+		#else
+		Debug.Log("No sharing set up for this platform.");
+		#endif
+	}
+
+
+
+	#if UNITY_ANDROID
+	public IEnumerator ShareTextInAnroid () {
+
+		var shareSubject = "";
+		isProcessing = true;
+
+		if (!Application.isEditor) {
+			//Create intent for action send
+			AndroidJavaClass intentClass = 
+				new AndroidJavaClass ("android.content.Intent");
+			AndroidJavaObject intentObject = 
+				new AndroidJavaObject ("android.content.Intent");
+			intentObject.Call<AndroidJavaObject> 
+				("setAction", intentClass.GetStatic<string> ("ACTION_SEND"));
+
+			//put text and subject extra
+			intentObject.Call<AndroidJavaObject> ("setType", "text/plain");
+			intentObject.Call<AndroidJavaObject> 
+				("putExtra", intentClass.GetStatic<string> ("EXTRA_SUBJECT"), shareSubject);
+			intentObject.Call<AndroidJavaObject> 
+				("putExtra", intentClass.GetStatic<string> ("EXTRA_TEXT"), shareMessage);
+
+			//call createChooser method of activity class
+			AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+			AndroidJavaObject currentActivity = 
+				unity.GetStatic<AndroidJavaObject> ("currentActivity");
+			AndroidJavaObject chooser = 
+				intentClass.CallStatic<AndroidJavaObject> 
+				("createChooser", intentObject, "Share your high score");
+			currentActivity.Call ("startActivity", chooser);
+		}
+
+		yield return new WaitUntil (() => isFocus);
+		isProcessing = false;
+	}
+    #endif
 }

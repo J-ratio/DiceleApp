@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     //List of UI elements stored in ResultScreenUI
     //0 => ScoreText Center, 1 => ScoreText Left, 2 => RankText, 3 => XPText, 4 => CoinsText, 5 => Classic ScoreText, 6 => Classic Xp, 7 => Classic Coin
     [SerializeField] private TextMeshProUGUI[] ResultScreenUI;
+    [SerializeField] private GameObject ResultShareButton;
 
     //0 => ScoreHead Center, 1 => ScoreHead Left, 2 => RankHead
     public GameObject[] ResultScreenScoreUI;
@@ -30,6 +31,8 @@ public class UIManager : MonoBehaviour
     //List of UI elements stored in GameScreenUI
     //0 => CoinText, 1 => DayText, 2 => MonthText, 3 => UndoChargeText, 4 => HintChargeText
     [SerializeField] public TextMeshProUGUI[] GameScreenUI;
+    [SerializeField] private Image GameBackground;
+    [SerializeField] private Transform[] RowsAndCols; 
 
     //List of UI elements stored in CalanderScreenUI
     //0 => XpText, 1 => CoinText
@@ -52,6 +55,11 @@ public class UIManager : MonoBehaviour
 
 
     public static bool SoundTogggle = true;
+    public static bool BackgroundToggle = true;
+
+    [SerializeField] Toggle BackgroundToggle1;
+    [SerializeField] Toggle BackgroundToggle2;
+    bool ChangeToggle = true;
 
     void OnEnable()
     {
@@ -98,6 +106,37 @@ public class UIManager : MonoBehaviour
     {
         if(SoundTogggle) SoundTogggle = false;
         else SoundTogggle = true;
+    }
+
+    public void ChangeBackgroundToggle()
+    {
+        if(ChangeToggle)
+        {
+            int count = RowsAndCols[0].childCount;
+            ChangeToggle = false;
+            if(BackgroundToggle) {
+                Debug.Log("111"); BackgroundToggle = false; GameBackground.color = new Color32(13,25,67,255); BackgroundToggle1.isOn = false; BackgroundToggle2.isOn = false;
+                
+                for(int i = 0; i < 2*count ; i++){
+                    RowsAndCols[i/count].GetChild(i%count).GetChild(0).GetComponent<TextMeshProUGUI>().color = new Color32(255,255,255,255);
+                }
+            }
+            else {
+                BackgroundToggle = true; GameBackground.color = new Color32(255,255,255,255); BackgroundToggle1.isOn = true; BackgroundToggle2.isOn = true;
+            
+                for(int i = 0; i < 2*count ; i++){
+                    RowsAndCols[i/count].GetChild(i%count).GetChild(0).GetComponent<TextMeshProUGUI>().color = new Color32(76,76,76,255);
+                }
+            }
+        }
+
+        Invoke("ChangeToggleValue", 0.1f);
+
+    }
+
+    void ChangeToggleValue()
+    {
+        ChangeToggle = true;
     }
 
 
@@ -148,12 +187,15 @@ public class UIManager : MonoBehaviour
             ResultScreenScoreUI[1].SetActive(true);
             ResultScreenScoreUI[2].SetActive(true);
 
+            ResultShareButton.SetActive(true);
+
         }
         else
         {
             ResultScreenScoreUI[0].SetActive(true);
             ResultScreenScoreUI[1].SetActive(false);
             ResultScreenScoreUI[2].SetActive(false);
+            ResultShareButton.SetActive(false);
         }
     }
 
@@ -176,24 +218,25 @@ public class UIManager : MonoBehaviour
 
     IEnumerator CoinTextAnim(int coins) {
         
-        float waitTime = 3.0f/coins;
         int initialCoins = int.Parse(MainScreenUI[1].text);
         int temp = 0;
-
-        Debug.Log(initialCoins);
     
 
-        while( initialCoins + temp != coins)
+        while( initialCoins + temp != coins && temp < 10 && temp > -10)
         {
-            if(initialCoins > coins) temp--;
-            else temp++;
-            
+            if(initialCoins > coins) {temp--;  if(initialCoins + temp < coins) break; }
+            else { temp++;  if(initialCoins + temp > coins) break; }
+
             MainScreenUI[1].text = (initialCoins + temp).ToString();
             CalanderScreenUI[1].text = (initialCoins + temp).ToString();
             GameScreenUI[0].text = (initialCoins + temp).ToString();
 
-            yield return new WaitForSeconds(waitTime);
+            yield return new WaitForEndOfFrame();
         }
+
+        MainScreenUI[1].text = (coins).ToString();
+        CalanderScreenUI[1].text = (coins).ToString();
+        GameScreenUI[0].text = (coins).ToString();
 
         yield break;
     }

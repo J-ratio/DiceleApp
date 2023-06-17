@@ -547,7 +547,8 @@ public class Board : MonoBehaviour
                 }
             }
 
-            //LogLineSol();
+
+            LogLineSol();
 
             swapped++;
 
@@ -765,11 +766,43 @@ public class Board : MonoBehaviour
         Dice dice = previousSwappedDice[1];
 
 
+        if(lineSolutionList[swap_dice.slotPos[1]].Count(x => x != -1) == 0)
+        {
+            HorSumList.transform.GetChild(swap_dice.slotPos[1]).GetComponent<Animator>().enabled = false;
+            HorSumList.transform.GetChild(swap_dice.slotPos[1]).GetChild(2).gameObject.SetActive(false);
+            HorSumList.transform.GetChild(swap_dice.slotPos[1]).GetComponent<RectTransform>().rotation = Quaternion.Euler(Vector3.zero);
+
+        }
+        
+        if(lineSolutionList[swap_dice.slotPos[0]+Num].Count(x => x != -1) == 0)
+        {
+            VertSumList.transform.GetChild(swap_dice.slotPos[0]).GetComponent<Animator>().enabled = false;
+            VertSumList.transform.GetChild(swap_dice.slotPos[0]).GetChild(2).gameObject.SetActive(false);
+            VertSumList.transform.GetChild(swap_dice.slotPos[0]).GetComponent<RectTransform>().rotation = Quaternion.Euler(Vector3.zero);
+
+        }
+
+        if(lineSolutionList[dice.slotPos[1]].Count(x => x != -1) == 0)
+        {
+            HorSumList.transform.GetChild(dice.slotPos[1]).GetComponent<Animator>().enabled = false;
+            HorSumList.transform.GetChild(dice.slotPos[1]).GetChild(2).gameObject.SetActive(false);
+            HorSumList.transform.GetChild(dice.slotPos[1]).GetComponent<RectTransform>().rotation = Quaternion.Euler(Vector3.zero);
+
+        }
+        
+        if(lineSolutionList[dice.slotPos[0]+Num].Count(x => x != -1) == 0)
+        {
+            VertSumList.transform.GetChild(dice.slotPos[0]).GetComponent<Animator>().enabled = false;
+            VertSumList.transform.GetChild(dice.slotPos[0]).GetChild(2).gameObject.SetActive(false);
+            VertSumList.transform.GetChild(dice.slotPos[0]).GetComponent<RectTransform>().rotation = Quaternion.Euler(Vector3.zero);
+
+        }
+
         if (dice.slotsolution == dice.diceNumber)
         {
             dice.GetComponent<BoxCollider2D>().enabled = true;
-            lineSolutionList[dice.slotPos[1]].Add(dice.diceNumber);
-            lineSolutionList[dice.slotPos[0] + Num].Add(dice.diceNumber);
+            lineSolutionList[dice.slotPos[1]].Add(dice.slotsolution);
+            lineSolutionList[dice.slotPos[0] + Num].Add(dice.slotsolution);
             dice.matched = false;
             matched--;
 
@@ -778,8 +811,8 @@ public class Board : MonoBehaviour
         if (swap_dice.slotsolution == swap_dice.diceNumber)
         {
             swap_dice.GetComponent<BoxCollider2D>().enabled = true;
-            lineSolutionList[swap_dice.slotPos[1]].Add(swap_dice.diceNumber);
-            lineSolutionList[swap_dice.slotPos[0] + Num].Add(swap_dice.diceNumber);
+            lineSolutionList[swap_dice.slotPos[1]].Add(swap_dice.slotsolution);
+            lineSolutionList[swap_dice.slotPos[0] + Num].Add(swap_dice.slotsolution);
             matched--;
             swap_dice.matched = false;
 
@@ -796,6 +829,9 @@ public class Board : MonoBehaviour
         int solTemp = swap_dice.slotsolution;
         swap_dice.slotsolution = dice.slotsolution;
         dice.slotsolution = solTemp;
+
+
+
 
         swapped--;
         movesText.text = (Num*Num - emptySlots.Count - swapped).ToString();

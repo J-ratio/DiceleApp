@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class RankManagement : MonoBehaviour
@@ -32,6 +33,8 @@ public class RankManagement : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI[] Headers;
 
+    [SerializeField] Button ResultsBtn;
+
     
 
     // Start is called before the first frame update
@@ -54,7 +57,11 @@ public class RankManagement : MonoBehaviour
     public void OnPress(int x)
     {
         if(x == 0)
-        {
+        {   
+            ResultsBtn.gameObject.SetActive(true);
+            ResultsBtn.onClick.RemoveAllListeners();
+            ResultsBtn.onClick.AddListener(delegate {DataManager.transform.GetComponent<MedalsManager>().ShowResults(true); });
+
             Headers[0].text = "YESTERDAY";
             Headers[1].text = "TODAY";
             ShowDailyBoard();
@@ -67,6 +74,10 @@ public class RankManagement : MonoBehaviour
         }
         else if(x == 1)
         {
+            ResultsBtn.gameObject.SetActive(false);
+            ResultsBtn.onClick.RemoveAllListeners();
+            ResultsBtn.onClick.AddListener(delegate {DataManager.transform.GetComponent<MedalsManager>().ShowResults(false); });
+
             Headers[0].text = "Top Scores";
             Headers[1].text = "WEEKLY";
             ShowWeeklyBoard();
@@ -79,6 +90,7 @@ public class RankManagement : MonoBehaviour
         }
         else
         {
+            ResultsBtn.gameObject.SetActive(false);
             Headers[0].text = "Top Scores";
             Headers[1].text = "ALL-TIME";
             ShowAllTimeBoard();

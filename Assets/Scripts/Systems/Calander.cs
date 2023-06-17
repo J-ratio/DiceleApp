@@ -31,6 +31,10 @@ public class Calander : MonoBehaviour
     [SerializeField]
     private GameObject nextButton;
 
+    [SerializeField] Image[] Trophies;
+
+    [SerializeField] TrophyManager TrophyManager;
+
     /// <summary>
     /// Cell or slot in the calendar. All the information each day should now about itself
     /// </summary>
@@ -158,6 +162,12 @@ public class Calander : MonoBehaviour
 
         if(DateTime.Now.Month == month) nextButton.SetActive(false);
         else nextButton.SetActive(true);
+
+
+        Trophies[0].sprite = TrophyManager.GetTrophyImage(month - StartDate.Month)[0];
+        Trophies[1].sprite = TrophyManager.GetTrophyImage(month - StartDate.Month)[1];
+        Trophies[2].sprite = TrophyManager.GetTrophyImage(month - StartDate.Month)[2];
+
 
         DateTime temp = new DateTime(year, month, 1);
         currDate = temp;

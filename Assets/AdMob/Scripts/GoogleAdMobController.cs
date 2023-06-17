@@ -371,8 +371,9 @@ public class GoogleAdMobController : MonoBehaviour
             rewardedAd.Show((Reward reward) =>
             {
                 PrintStatus("Rewarded ad granted a reward: " + reward.Amount);
-                
-                switch(i) 
+            });
+
+            switch(i) 
                 {
                     case 1:
                         DataManager.Collect(true);
@@ -387,9 +388,6 @@ public class GoogleAdMobController : MonoBehaviour
                         DataManager.AwardGold();
                         break;
                 }
-
-
-            });
         }
         else
         {

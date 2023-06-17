@@ -17,10 +17,12 @@ public class TrophyManager : MonoBehaviour
     [SerializeField] Sprite[] ActiveTrophies;
     [SerializeField] Sprite[] DisabledTrophies;
 
+    int[] trophyCount = new int[3];
+
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         GameObject t;
         for(int i = 0; i < 12; i++)
@@ -36,8 +38,11 @@ public class TrophyManager : MonoBehaviour
             }
             else {
                 TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = DisabledTrophies[i*3];
+                TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().color = Color.black;
                 TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().sprite = DisabledTrophies[i*3+1];
+                TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().color = Color.black;
                 TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().sprite = DisabledTrophies[i*3+2];
+                TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().color = Color.black;
             }
             
         }
@@ -108,30 +113,56 @@ public class TrophyManager : MonoBehaviour
         SetTrophies();
     }
 
+    public Sprite[] GetTrophyImage(int i)
+    {
+        Sprite[] images = new Sprite[3];
+
+        images[0] = ActiveTrophies[i*3];
+        images[1] = ActiveTrophies[i*3 + 1];
+        images[2] = ActiveTrophies[i*3 + 2];
+
+        return images;
+    }
+
 
     void SetTrophies()
     {
         int month = StartDate.Month - 1;
-
+        trophyCount[0] = 0;
+        trophyCount[1] = 0;
+        trophyCount[2] = 0;
 
         for(int i = 0; i < 12; i++)
         {
             if(i < month + MonthlyStarsList.Count && i >= month)
             {
-                if(MonthlyStarsList[i - month] >= 15 && MonthlyStarsList[i - month] < 60 )
+                if(MonthlyStarsList[i - month] >= 15)
                 {
                     TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3];
+                    TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().color = Color.white;
+                    trophyCount[0]++;
                 }
-                else if(MonthlyStarsList[i - month] < GetMonthStars(i) && MonthlyStarsList[i - month] >= 60)
+                if(MonthlyStarsList[i - month] >= 60)
                 {
                     TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3+1];
+                    TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().color = Color.white;
+                    trophyCount[1]++;
                 }
-                else if(MonthlyStarsList[i - month] >= GetMonthStars(i))
+                if(MonthlyStarsList[i - month] >= GetMonthStars(i))
                 {
                     TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3];
+                    TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().color = Color.white;
+                    trophyCount[2]++;
                 }
             }
         }
+    }
+
+    public void ShareTrophyStats()
+    {
+        string msg = "Check out my Dicele Trophies\n" + trophyCount[2].ToString() + " gold \n" + trophyCount[1].ToString() + "silver \n" + trophyCount[0].ToString() + "bronze\n#DiceleApp";
+        DataManager.shareMessage = msg;
+        DataManager.ShareText();
     }
 
 

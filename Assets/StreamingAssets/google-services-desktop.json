@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "407345662315",
+    "project_id": "diceleapp",
+    "storage_bucket": "diceleapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:407345662315:android:9dea27eabd7223a4f5a42e",
+        "android_client_info": {
+          "package_name": "com.sagaci.dicele"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "407345662315-1iq4svijqp7o4vvd9c9acuihqale6qu3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6lyJokyg_g_am_Uy3mgOYnon_6D4rtbI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "407345662315-1iq4svijqp7o4vvd9c9acuihqale6qu3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

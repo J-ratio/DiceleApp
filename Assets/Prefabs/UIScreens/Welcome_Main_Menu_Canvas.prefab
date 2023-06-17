@@ -412,8 +412,8 @@ RectTransform:
   - {fileID: 6015387167213689484}
   - {fileID: 6015387165725706230}
   - {fileID: 6015387166392443441}
-  - {fileID: 6015387166923732883}
   - {fileID: 6015387166639615503}
+  - {fileID: 6015387166923732883}
   - {fileID: 6015387165535547038}
   - {fileID: 6015387165445116715}
   m_Father: {fileID: 6015387166060606483}
@@ -767,7 +767,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6015387165782376427}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1127,7 +1127,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6015387165782376427}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1351,6 +1351,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4662f901def544cb509fabd8abd6ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slider: {fileID: 0}
+  logo: {fileID: 0}
 --- !u!1 &6721292391294698746
 GameObject:
   m_ObjectHideFlags: 0
