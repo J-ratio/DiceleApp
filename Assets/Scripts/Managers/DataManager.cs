@@ -4,11 +4,14 @@ using UnityEngine;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Play.Review;
+
 
 
 public class DataManager : MonoBehaviour
 {
-    
+    private ReviewManager _reviewManager;
+    private PlayReviewInfo _playReviewInfo;
 
     private List<int> solList = new List<int>();
     private List<int> spawnList = new List<int>();
@@ -621,16 +624,32 @@ public class DataManager : MonoBehaviour
         UpdateStats();
         slider.SetSliderToFull();
 
-        if(UserData.info.isAdDisabled)
+        if(!UserData.info.isAdDisabled)
         {
             transform.GetComponent<GoogleAdMobController>().RequestBannerAd();
         }
 
         if(isFirstTime) StartClassicLvl();
 
+
+        StartCoroutine("RequestReview");
+
     }
 
 
+    IEnumerator RequestReview() {
+        _reviewManager = new ReviewManager();
+        var requestFlowOperation = _reviewManager.RequestReviewFlow();
+        yield return requestFlowOperation;
+        if (requestFlowOperation.Error != ReviewErrorCode.NoError)
+        {
+            // Log error. For example, using requestFlowOperation.Error.ToString().
+            Debug.Log(requestFlowOperation.Error.ToString());
+            yield break;
+        }
+        _playReviewInfo = requestFlowOperation.GetResult();
+    }
+ 
     public async void RemoveAds()
     {
         AdsClass Object = new AdsClass();
@@ -1491,6 +1510,23 @@ public class DataManager : MonoBehaviour
         Object1.playerXp = PlayerXp;
         await ApiHelper.SendJSONData(postURL+userProfileURL+updateStatsURL, Object1);
         //-----------------------------------------------------------------------
+
+        if(ClassicLvlIndex == 7) {
+            StartCoroutine("LaunchReview");
+        }
+    }
+
+    IEnumerator LaunchReview() {
+
+        var launchFlowOperation = _reviewManager.LaunchReviewFlow(_playReviewInfo);
+        yield return launchFlowOperation;
+        _playReviewInfo = null; // Reset the object
+        if (launchFlowOperation.Error != ReviewErrorCode.NoError)
+        {
+            // Log error. For example, using requestFlowOperation.Error.ToString().
+            Debug.Log("InApp-review Launch Failed");
+            yield break;
+        }
     }
 
 

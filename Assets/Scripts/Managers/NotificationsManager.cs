@@ -58,8 +58,8 @@ public class NotificationsManager : MonoBehaviour
         two_day_notif.ShowTimestamp = true;
         two_day_notif.RepeatInterval = new TimeSpan(48,0,0);
         var date = DateTime.Now;
-        var day = new DateTime(date.Year, date.Month, date.Day);
-        two_day_notif.FireTime = day.AddHours(18);
+        var day = date.AddDays(1);
+        two_day_notif.FireTime = day;
 
         var identifier0 = AndroidNotificationCenter.SendNotification(two_day_notif, "example_channel");
 
@@ -114,7 +114,14 @@ public class NotificationsManager : MonoBehaviour
         var identifier1 = AndroidNotificationCenter.SendNotification(trophy_notif, "example_channel");
         if(AndroidNotificationCenter.CheckScheduledNotificationStatus (identifier1) == NotificationStatus.Scheduled) {
             AndroidNotificationCenter.CancelAllNotifications();
-            AndroidNotificationCenter.SendNotification(trophy_notif,  "example_channel");
+            StartCoroutine("SendNotif1");
+        }
+
+
+        IEnumerator SendNotif1() {
+            yield return new WaitForSeconds(600);
+            AndroidNotificationCenter.UpdateScheduledNotification(identifier1, trophy_notif,  "example_channel");
+            yield return null;
         }
 
 
@@ -123,8 +130,8 @@ public class NotificationsManager : MonoBehaviour
         AndroidNotification daily_notif = new AndroidNotification();
 
         daily_notif.ShowTimestamp = true;
-        var startDay = new DateTime(date.Year, date.Month, date.Day);
-        daily_notif.FireTime = startDay.AddHours(4);
+        var startDay = date.AddDays(1);
+        daily_notif.FireTime = startDay;
         daily_notif.RepeatInterval = new TimeSpan(24,0,0);
         daily_notif.Title= "🎲 Daily Dicele Updated!! 🎲";
         daily_notif.Text = "Solve to find where you stand in the 🌍";
@@ -132,7 +139,14 @@ public class NotificationsManager : MonoBehaviour
         var identifier2 = AndroidNotificationCenter.SendNotification(daily_notif, "example_channel");
         if(AndroidNotificationCenter.CheckScheduledNotificationStatus (identifier2) == NotificationStatus.Scheduled) {
             AndroidNotificationCenter.CancelAllNotifications();
-            AndroidNotificationCenter.SendNotification(daily_notif,  "example_channel");
+            StartCoroutine("SendNotif2");
+        }
+
+
+        IEnumerator SendNotif2() {
+            yield return new WaitForSeconds(3600);
+            AndroidNotificationCenter.UpdateScheduledNotification(identifier2, daily_notif,  "example_channel");
+            yield return null;
         }
 
 

@@ -115,6 +115,7 @@ public class TrophyManager : MonoBehaviour
 
     public Sprite[] GetTrophyImage(int i)
     {
+        i = i%6;
         Sprite[] images = new Sprite[3];
 
         images[0] = ActiveTrophies[i*3];
@@ -138,19 +139,19 @@ public class TrophyManager : MonoBehaviour
             {
                 if(MonthlyStarsList[i - month] >= 15)
                 {
-                    TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3];
+                    TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[((i%6)*3)];
                     TrophyList[i].GetChild(3).GetChild(0).GetComponent<Image>().color = Color.white;
                     trophyCount[0]++;
                 }
                 if(MonthlyStarsList[i - month] >= 60)
                 {
-                    TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3+1];
+                    TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[((i%6)*3+1)];
                     TrophyList[i].GetChild(4).GetChild(0).GetComponent<Image>().color = Color.white;
                     trophyCount[1]++;
                 }
                 if(MonthlyStarsList[i - month] >= GetMonthStars(i))
                 {
-                    TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[i*3];
+                    TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().sprite = ActiveTrophies[((i%6)*3 + 2)];
                     TrophyList[i].GetChild(5).GetChild(0).GetComponent<Image>().color = Color.white;
                     trophyCount[2]++;
                 }
